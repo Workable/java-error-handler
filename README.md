@@ -36,6 +36,7 @@ ErrorHandler
           return false;
       }
   })
+  // now let's handle all general, cross-cut or uncommon errors here 
   .on(FooException.class, (throwable, errorHandler) -> {
     // handle foo errors
   })
@@ -65,7 +66,7 @@ ErrorHandler
 Then on a specific part of your app, most probably an action handler inside a sceen, controller etc.
 
 ```java
- ErrorHandler errorHandler1 = ErrorHandler
+ ErrorHandler
     .create()
     .on(FooException.class, (throwable, errorHandler) -> {
       // handle foo here and don't let the default handler deal with it
