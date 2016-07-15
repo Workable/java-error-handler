@@ -2,14 +2,20 @@
 A tool for efficiently handling errors in your Java projects
 
 ## About
-A common problem specially in UI software, is that of handling errors.
+A common problem specially in software, and especially in UI software is that of handling errors.
 
-We usually want to:
+Some errors, like network or some database errors designate truly exceptional conditions, while others are more to be expected like let's say input validation errors or authentication errors.
 
-* handle a range of uncommon errors in the same way, centrally
-* handle unknown errors in some other way
-* handle specific and expected errors depending on when and where they happen (i.e. during which action and on what screen)
-* be able to add an exception to the rule (i.e. handle an uncommon error globally except for on this screen)
+Some errors are common, cross-cut concerns, as they can happen throughout the app while others are specific to a single operation, screen or action.
+
+Finally, there's always the possibility of dealing with a completely unknown error.
+
+With that in mind, we usually want to:
+
+* handle all common errors centrally from one place inside the codebase
+* handle unknown errors is some other way, also from one place
+* handle specific and expected errors depending on when and where they happen (i.e. on which action and on what screen)
+* be able to override the rules above when needed (i.e. handle all network errors the same way, except for when sending an e-mmail)
 
 _This tool allows you to do so efficiently while keeping your code DRY_
 
