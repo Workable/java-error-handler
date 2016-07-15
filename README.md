@@ -20,6 +20,7 @@ Setup a default error handler
 ```java
 ErrorHandler
   .defaultErrorHandler()
+  // bind an error matcher to a code
   .bindErrorCode("closed:bar", errorCode -> throwable -> {
       if (throwable instanceof BarException) {
           return !((BarException) throwable).isOpenBar();
@@ -27,6 +28,7 @@ ErrorHandler
           return false;
       }
   })
+  // bind an error matcher to a code class, for example integers could designate HTTP errors
   .bindErrorCodeClass(Integer.class, errorCode -> throwable -> {
       if (throwable instanceof HttpException) {
           return ((HttpException) throwable).getHttpStatus() == errorCode;
