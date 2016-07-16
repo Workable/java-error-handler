@@ -14,11 +14,11 @@ With that in mind, we usually want to:
 
 1. have a default handler for every expected error
 2. have a default handler for every exceptional or cross-cut concern error
-3. handle specific errors depending on where and when they occur
+3. handle specific errors depending on when and where they occur
 4. override defaults when needed
 5. keep our code DRY 
 
-Java, as language, provides you with a way to do the above. By mapping exceptional cross-cut errors to runtime exceptions and catching them lower in the call stack, while having specific expected errors mapped to checked exceptions and handle them near where the error occurred. Still, countless are the projects where this simple strategy has gone astray with lots of errors being either swallowed or left for the `Thread.UncaughtExceptionHandler`. Moreover, it usually comes with significant boilerplate code.
+Java, as a language, provides you with a way to do the above. By mapping exceptional cross-cut errors to runtime exceptions and catching them lower in the call stack, while having specific expected errors mapped to checked exceptions and handle them near where the error occurred. Still, countless are the projects where this simple strategy has gone astray with lots of errors being either swallowed or left for the `Thread.UncaughtExceptionHandler`. Moreover, it usually comes with significant boilerplate code.
 
 > `ErrorHandler` was built to make handling and logging every error easier, without boilerplate and less room for mistakes. It was created for the needs of an Android app and it proved itself useful very quickly. So it may work for you as well.
 
