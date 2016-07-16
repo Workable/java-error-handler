@@ -15,7 +15,7 @@ With that in mind, we usually want to:
 1. have a default handler for every expected error
 2. handle all exceptional or cross-cut errors
 3. handle specific expected errors depending on where and when they occur
-4. be able to override the rules above when needed (i.e. when we need to override how an exceptional cross-cut error is handled on a certain occasion)
+4. override defaults on certain cases
 5. keep our code DRY 
 
 Java, as language, provides you with a way to do the above. By mapping exceptional cross-cut errors to runtime exceptions and catching them lower in the call stack, while having specific expected errors mapped to checked exceptions and handle them near where the error occurred. Still, countless are the projects where this simple strategy has gone astray with lots of errors being either swallowed or left for the `Thread.UncaughtExceptionHandler`. Moreover, it usually comes with significant boilerplate code.
