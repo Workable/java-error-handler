@@ -2,23 +2,26 @@
 A tool for efficiently handling errors in your Java projects
 
 ## About
-A common problem specially in software, and especially in UI software is that of handling errors.
+A common problem in software, specially in UI software is that of error handling.
 
-Some errors, like network or some database errors designate truly exceptional conditions, while others are more to be expected like let's say input validation errors or authentication errors.
+Some errors, like `network` or `database` errors designate truly **exceptional conditions**, while others are core parts of the business logic flow like let's say input `validation` or `authentication` errors.
 
-Some errors are common, cross-cut concerns, as they can happen throughout the app while others are specific to a single operation, screen or action.
+Some errors are common, **cross-cut concerns** as they can occur throughout the app while others are **specific** to a single operation, screen or action. Think of `UnauthorizedException` versus `InvalidPasswordException`.
 
-Finally, there's always the possibility of dealing with a completely unknown error.
+Finally, there's always the possibility of dealing with a completely unknown, at authoring/compile time, error.
 
 With that in mind, we usually want to:
 
-* handle all common errors centrally from one place inside the codebase
-* handle unknown errors is some other way, also from one place
-* handle specific and expected errors depending on when and where they happen (i.e. on which action and on what screen)
-* be able to override the rules above when needed (i.e. handle all network errors the same way, except for when sending an e-mmail)
+1. have a default handler for every expected error while keeping DRY
+2. handle all exceptional or cross-cut errors and still keep DRY
+2. handle specific expected errors depending on where and when they occur
+3. be able to override the rules above when needed (i.e. when we need to override how an exceptional cross-cut error is handled on a certain occasion)
 
-_This tool allows you to do so efficiently while keeping your code DRY_
+Java, as language, provides you with a way to do the above. By mapping exceptional cross-cut errors to runtime exceptions and catching them lower in the call stack, while having specific expected errors mapped to checked exceptions and handle them near where the error occurred. Still, countless are the projects where this simple strategy has gone astray with lots of errors being either swallowed or left for the `Thread.UncaughtExceptionHandler`. Moreover, it usually comes with significant boilerplate code.
 
+> `ErrorHandler` was built to make handling and logging every error easier, without boilerplate and less room for mistakes. It was created for the needs of an Android app and it proved itself useful very quickly. So it may work for you as well.
+
+This library doesn't solve Java specific error handling problems, although it does help with the `log and shallow` anti-pattern as it provides an opinionated and straightforward way to act inside every `catch` clause. If you're developing in  _Swift_ or _Javascript_ we're baking em and will be available really soon. 
 
 ## Usage
 Setup a default error handler
