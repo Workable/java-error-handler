@@ -1,4 +1,4 @@
-# java-error-handler
+# [java-error-handler](https://github.com/Workable/java-error-handler)
 A tool for efficiently handling errors in your Java projects
 
 ## About
