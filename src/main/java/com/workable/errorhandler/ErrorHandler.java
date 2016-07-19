@@ -194,11 +194,21 @@ public class ErrorHandler {
     }
 
     /**
-     * Skip all following matching actions
+     * Skip all following actions registered via an {@code on} method
      */
     public ErrorHandler skipFollowing() {
         if (localContext != null) {
             localContext.get().skipFollowing = true;
+        }
+        return this;
+    }
+
+    /**
+     * Skip all actions registered via {@link #always(Action)}
+     */
+    public ErrorHandler skipAlways() {
+        if (localContext != null) {
+            localContext.get().skipAlways = true;
         }
         return this;
     }
@@ -229,16 +239,18 @@ public class ErrorHandler {
             }
         }
 
-        if (!localContext.get().handled && !otherwiseActions.isEmpty()) {
+        if (!ctx.handled && !otherwiseActions.isEmpty()) {
             for (Action action : otherwiseActions) {
                 action.execute(error, this);
                 ctx.handled = true;
             }
         }
 
-        for (Action action : alwaysActions) {
-            action.execute(error, this);
-            ctx.handled = true;
+        if (!ctx.skipAlways) {
+            for (Action action : alwaysActions) {
+                action.execute(error, this);
+                ctx.handled = true;
+            }
         }
 
         if (parentErrorHandler != null && !ctx.skipDefaults) {
