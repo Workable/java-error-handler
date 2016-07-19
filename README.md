@@ -1,5 +1,5 @@
 # [java-error-handler](https://github.com/Workable/java-error-handler)
-A tool for efficiently handling errors in your Java projects
+> A tool for efficiently handling errors in your Java projects
 
 ## About
 A common problem in software, specially in UI software is that of error handling.
@@ -18,17 +18,15 @@ With that in mind, we usually want to:
 4. **override** any default handler if needed 
 5. keep our code **DRY**
 
-Java, as a language, provides you with a way to do the above. By mapping exceptional or very common errors to runtime exceptions and catching them lower in the call stack, while having specific expected errors mapped to checked exceptions and handle them near where the error occurred. Still, countless are the projects where this simple strategy has gone astray with lots of errors being either swallowed or left for the catch-all `Thread.UncaughtExceptionHandler`. Moreover, it usually comes with significant boilerplate code.
+Java, as a language, provides you with a way to do the above. By mapping exceptional or very common errors to runtime exceptions and catching them lower in the call stack, while having specific expected errors mapped to checked exceptions and handle them near where the error occurred. Still, countless are the projects where this simple strategy has gone astray with lots of errors being either swallowed or left for the catch-all `Thread.UncaughtExceptionHandler`. Moreover, it usually comes with significant boilerplate code. `ErrorHandler` however eases this practice through its fluent API, error aliases and defaults mechanism.
 
-> `ErrorHandler` was built to make achieving the above a lot easier.
-
-This library doesn't solve Java specific error handling problems, although it does help with the `log and shallow` anti-pattern as it provides an opinionated and straightforward way to act inside every `catch` block.  It was created for the needs of an Android app and it proved itself useful very quickly. So it may work for you as well. If you like the concept and you're developing in  _Swift_ or _Javascript_, we're baking em and will be available really soon.
+This library doesn't try to solve Java specific problems, although it does help with the `log and shallow` anti-pattern as it provides an opinionated and straightforward way to act inside every `catch` block.  It was created for the needs of an Android app and proved itself useful very quickly. So it may work for you as well. If you like the concept and you're developing in  _Swift_ or _Javascript_, we're baking em and will be available really soon.
 
 
 ## Example
 Let's say we're building a messaging app for Android that uses Foo service for crash reporting. 
 
-*TODO*
+*WIP*
 
 ```java
 ErrorHandler
@@ -95,7 +93,7 @@ Then on a specific part of your app, most probably an action handler inside a sc
 
 ## API
 
-*TODO*
+*WIP*
 
 ## License
 
