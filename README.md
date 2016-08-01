@@ -1,6 +1,4 @@
-# java-error-handler
-[![Travis](https://img.shields.io/travis/workable/java_error_handler.svg)]()
-[![Bintray](https://img.shields.io/bintray/v/workable/maven/java_error_handler.svg?maxAge=2592000)]()
+# java-error-handler [![Travis](https://img.shields.io/travis/workable/java_error_handler.svg)]() [![Bintray](https://img.shields.io/bintray/v/workable/maven/java_error_handler.svg?maxAge=2592000)]()
 
 > A tool for efficiently handling errors in your Java projects
 
