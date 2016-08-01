@@ -1,28 +1,25 @@
-# java-error-handler [![Travis](https://img.shields.io/travis/workable/java_error_handler.svg)]() [![Bintray](https://img.shields.io/bintray/v/workable/maven/java_error_handler.svg?maxAge=2592000)]()
+# java-error-handler 
 
-> A tool for efficiently handling errors in your Java projects
+[![Travis](https://img.shields.io/travis/workable/java_error_handler.svg)]() [![Bintray](https://img.shields.io/bintray/v/workable/maven/java_error_handler.svg?maxAge=2592000)]()
 
-## About
-A common problem in software, specially in UI software is that of error handling.
+> Error handling library for Android and Java
 
-One way to classify errors can be by how they relate to the [problem domain](https://en.wikipedia.org/wiki/Problem_domain). Some errors, like `network` or `database` errors are orthogonal to the problem domain and designate truly **exceptional conditions**, while others are core parts of the domain like let's say `validation` or `authentication` errors.
+## Download
+Download the  or grab via Maven:
+```xml
+<dependency>
+  <groupId>com.workable</groupId>
+  <artifactId>error-handler</artifactId>
+  <version>0.9</version>
+  <type>pom</type>
+</dependency>
+```
+or Gradle:
+```groovy
+compile 'compile 'com.workable:error-handler:0.9'
+```
 
-One other way is by their **scope**. Are they **common** throughout the application or **specific** to a single screen, object or even method? Think of `UnauthorizedException` versus `InvalidPasswordException`.
-
-Let's not forget another very simple distintion between errors. Those that are known at authoring time and thus **expected** (despite of how probable is that they occur), and those that are **unknown** until runtime.
-
-With that in mind, we usually want to:
-
-1. have a **default** handler for every **expected** (exceptional, common or not) error
-2. handle **specific** errors **as appropriate** based on where and when they occur
-3. have a **default** catch-all handler for **unknown** errors
-4. **override** any default handler if needed 
-5. keep our code **DRY**
-
-Java, as a language, provides you with a way to do the above. By mapping exceptional or very common errors to runtime exceptions and catching them lower in the call stack, while having specific expected errors mapped to checked exceptions and handle them near where the error occurred. Still, countless are the projects where this simple strategy has gone astray with lots of errors being either swallowed or left for the catch-all `Thread.UncaughtExceptionHandler`. Moreover, it usually comes with significant boilerplate code. `ErrorHandler` however eases this practice through its fluent API, error aliases and defaults mechanism.
-
-This library doesn't try to solve Java specific problems, although it does help with the `log and shallow` anti-pattern as it provides an opinionated and straightforward way to act inside every `catch` block.  It was created for the needs of an Android app and proved itself useful very quickly. So it may work for you as well. If you like the concept and you're developing in  _Swift_ or _Javascript_, we're baking em and will be available really soon.
-
+## Usage
 
 ## Example
 Let's say we're building a messaging app for Android that uses Foo service for crash reporting. 
@@ -95,6 +92,29 @@ Then on a specific part of your app, most probably an action handler inside a sc
 ## API
 
 *WIP*
+
+
+
+## About
+A common problem in software, specially in UI software is that of error handling.
+
+One way to classify errors can be by how they relate to the [problem domain](https://en.wikipedia.org/wiki/Problem_domain). Some errors, like `network` or `database` errors are orthogonal to the problem domain and designate truly **exceptional conditions**, while others are core parts of the domain like `validation` and `authentication` errors.
+
+Another way to classify errors is by their **scope**. Are they **common** throughout the application or **specific** to a single screen, object or even method? Think of `UnauthorizedException` versus `InvalidPasswordException`.
+
+And let's not forget another very simple distintion between errors. Those that are known at authoring time and thus **expected** (despite of how probable is that they occur), and those that are **unknown** until runtime.
+
+With that in mind, we usually want to:
+
+1. have a **default** handler for every **expected** (exceptional, common or not) error
+2. handle **specific** errors **as appropriate** based on where and when they occur
+3. have a **default** catch-all handler for **unknown** errors
+4. **override** any default handler if needed 
+5. keep our code **DRY**
+
+Java, as a language, provides you with a way to do the above. By mapping exceptional or very common errors to runtime exceptions and catching them lower in the call stack, while having specific expected errors mapped to checked exceptions and handle them near where the error occurred. Still, countless are the projects where this simple strategy has gone astray with lots of errors being either swallowed or left for the catch-all `Thread.UncaughtExceptionHandler`. Moreover, it usually comes with significant boilerplate code. `ErrorHandler` however eases this practice through its fluent API, error aliases and defaults mechanism.
+
+This library doesn't try to solve Java specific problems, although it does help with the `log and shallow` anti-pattern as it provides an opinionated and straightforward way to act inside every `catch` block.  It was created for the needs of an Android app and proved itself useful very quickly. So it may work for you as well. If you like the concept and you're developing in  _Swift_ or _Javascript_, we're baking em and will be available really soon.
 
 ## License
 
