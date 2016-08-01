@@ -1,4 +1,4 @@
-# java-error-handler 
+# ErrorHandler
 
 [![Travis](https://img.shields.io/travis/workable/java_error_handler.svg)]() [![Bintray](https://img.shields.io/bintray/v/workable/maven/java_error_handler.svg?maxAge=2592000)]()
 
