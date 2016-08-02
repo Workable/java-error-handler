@@ -15,8 +15,8 @@ Download the  or grab via Maven:
 </dependency>
 ```
 or Gradle:
-```groovy
-compile 'compile 'com.workable:error-handler:0.9'
+```gradle
+compile 'com.workable:error-handler:0.9'
 ```
 
 ## Usage
