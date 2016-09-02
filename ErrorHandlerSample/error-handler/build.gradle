@@ -1,0 +1,87 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+plugins {
+    id "com.jfrog.bintray" version "1.7"
+}
+
+group 'com.workable'
+version '0.9-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+test {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    compile group: 'junit', name: 'junit', version: '4.12'
+    compile 'org.mockito:mockito-core:2.1.0-beta.120'
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId 'com.workable'
+            artifactId 'error-handler'
+            version = '0.9'
+
+            from components.java
+
+            artifact sourceJar {
+                classifier = "sources"
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url "./dist"
+        }
+    }
+}
+
+
+Properties localProps = new Properties()
+localProps.load(project.file('local.properties').newDataInputStream())
+
+bintray {
+    user = localProps.getProperty('bintrayUser')
+    key = localProps.getProperty('bintrayApiKey')
+    publications = ['mavenJava']
+    pkg {
+        repo = 'maven'
+        name = 'error-handler'
+        desc = 'A tool for efficiently handling errors in your Java projects'
+        userOrg = user
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/Workable/java-error-handler'
+        labels = ['java', 'error handling', 'errors', 'android']
+        publicDownloadNumbers = true
+        version {
+            name = '0.9'
+            desc = 'A tool for efficiently handling errors in your Java projects'
+            vcsTag = '0.9'
+            gpg {
+                sign = true //Determines whether to GPG sign the files. The default is false
+            }
+        }
+    }
+}
