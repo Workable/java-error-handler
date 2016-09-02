@@ -15,14 +15,14 @@ Download the  or grab via Maven:
 </dependency>
 ```
 or Gradle:
-```gradle
+```groovy
 compile 'com.workable:error-handler:0.9'
 ```
 
 ## Usage
 
 ## Example
-Let's say we're building a messaging app for Android that uses Foo service for crash reporting. 
+Let's say we're building a messaging app for Android that uses Foo service for crash reporting.
 
 *WIP*
 
@@ -45,7 +45,7 @@ ErrorHandler
           return false;
       }
   })
-  // now let's handle all general, cross-cut or uncommon errors here 
+  // now let's handle all general, cross-cut or uncommon errors here
   .on(FooException.class, (throwable, errorHandler) -> {
     // handle foo errors
   })
@@ -79,7 +79,7 @@ Then on a specific part of your app, most probably an action handler inside a sc
     .create()
     .on(FooException.class, (throwable, errorHandler) -> {
       // handle foo here and don't let the default handler deal with it
-      errorHandler.skipDefaults(); 
+      errorHandler.skipDefaults();
     })
     .on("closed:bar", (throwable, errorHandler) -> {
       // handle an error by it's code
@@ -91,8 +91,96 @@ Then on a specific part of your app, most probably an action handler inside a sc
 
 ## API
 
-*WIP*
+> Create a new Instance of ErrorHandler with no default ErrorHandler.
 
+```java
+createIsolated()
+```
+
+> Create a new Instance of ErrorHandler that will use the default ErrorHandler (if set).
+
+```java
+create()
+```
+
+> Get the default ErrorHandler instance. If there is not one available, it creates a new Instance.
+> *Warning:* This method is synchronized, so be careful when you try to retrieve it from multiple Threads.
+
+```java
+defaultErrorHandler()
+```
+
+> _Action_ will be executed if a given Throwable matches with _Matcher_.
+
+```java
+on(Matcher, Action)
+```
+
+> _Action_ will be executed if a given Throwable is an instance of _<? extends Exception>_.
+
+```java
+on(Class<? extends Exception>, Action)
+```
+
+> _Action_ will be executed if a given Throwable is bound to T, through `bindErrorCode()`.
+
+```java
+on(T, Action)
+```
+
+> _Action_ will be executed if no previous _Action_ has been executed.
+
+```java
+otherwise(Action)
+```
+
+> _Action_ will be executed for every given Throwable.
+
+```java
+always(Action)
+```
+
+> Instruct the current ErrorHandler instance to skip the execution of subsequent registered _Actions_, through `on()`.
+
+```java
+skipFollowing()
+```
+
+> Instruct the current ErrorHandler instance to skip the execution of subsequent registered _Actions_ through `always()`.
+
+```java
+skipAlways()
+```
+
+> Instruct the current ErrorHandler instance to skip the execution of registered _Actions_ on the _defaultErrorHandler_ instance.
+
+```java
+skipDefaults()
+```
+
+> The _Throwable_ that we should act upon.
+
+```java
+handle(Throwable)
+```
+
+> Bind a _MatcherFactory_ to _T_.
+
+```java
+bindErrorCode(T, MatcherFactory)
+```
+
+> Bind a _MatcherFactory_ to _Class<T>_.
+
+```java
+bindErrorCodeClass(Class<T>, MatcherFactory)
+```
+
+> Clear current ErrorHandler instance from all _Actions_ and _Matchers_.
+
+```java
+clear()
+```
 
 
 ## About
@@ -109,7 +197,7 @@ With that in mind, we usually want to:
 1. have a **default** handler for every **expected** (exceptional, common or not) error
 2. handle **specific** errors **as appropriate** based on where and when they occur
 3. have a **default** catch-all handler for **unknown** errors
-4. **override** any default handler if needed 
+4. **override** any default handler if needed
 5. keep our code **DRY**
 
 Java, as a language, provides you with a way to do the above. By mapping exceptional or very common errors to runtime exceptions and catching them lower in the call stack, while having specific expected errors mapped to checked exceptions and handle them near where the error occurred. Still, countless are the projects where this simple strategy has gone astray with lots of errors being either swallowed or left for the catch-all `Thread.UncaughtExceptionHandler`. Moreover, it usually comes with significant boilerplate code. `ErrorHandler` however eases this practice through its fluent API, error aliases and defaults mechanism.

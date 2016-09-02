@@ -35,7 +35,8 @@ import java.util.Map;
  * instances of {@link Action}, that are found to match the error.
  *
  * @author Stratos Pavlakis <pavlakis@workable.com>
- * @author Pavlos Tournaris <tournaris@workable.com>
+ * @author Pavlos-Petros Tournaris <tournaris@workable.com>
+ * @author Vasilis Charalampakis <basilis@workable.com>
  */
 public class ErrorHandler {
 
@@ -75,7 +76,7 @@ public class ErrorHandler {
 
     /**
      * Create a new @{link ErrorHandler}, isolated from the default one.
-     *
+     * <p>
      * In other words, designed to handle all errors by itself without delegating
      * to the default error handler.
      *
@@ -87,7 +88,7 @@ public class ErrorHandler {
 
     /**
      * Create a new @{link ErrorHandler}, that delegates to the default one.
-     *
+     * <p>
      * Any default actions, are always executed after the ones registered on this one.
      *
      * @return returns a new instance of ErrorHandler
@@ -148,13 +149,13 @@ public class ErrorHandler {
      * if the thrown error is bound (associated) to {@param errorCode}.
      * <p/>
      * See {@link #bindErrorCodeClass(Class, MatcherFactory)} and {@link #bindErrorCode(Object, MatcherFactory)}
-     * on how to associate arbitrary error codes with actual throwables via {@link Matcher}.
+     * on how to associate arbitrary error codes with actual Throwables via {@link Matcher}.
      *
      * @param errorCode the error code
      * @param action    the associated action
      * @return the current instance of ErrorHandler
      */
-    public <T extends Object> ErrorHandler on(T errorCode, Action action) {
+    public <T> ErrorHandler on(T errorCode, Action action) {
         if (errorCode == null) {
             throw new IllegalArgumentException("errorCode cannot be null");
         }
@@ -273,11 +274,19 @@ public class ErrorHandler {
         });
     }
 
+    /**
+     * Bind an ErrorCode {@param errorCode} with a Matcher,
+     * through the provided MatcherFactory {@param matcherFactory}.
+     * */
     public <T> ErrorHandler bindErrorCode(T errorCode, MatcherFactory<? super T> matcherFactory) {
         errorCodeMap.put(new ErrorCodeIdentifier<>(errorCode), matcherFactory);
         return this;
     }
 
+    /**
+     * Bind an ErrorCode Class {@param errorCodeClass} with a Matcher,
+     * through the provided MatcherFactory {@param matcherFactory}.
+     * */
     public <T> ErrorHandler bindErrorCodeClass(Class<T> errorCodeClass, MatcherFactory<? super T> matcherFactory) {
         errorCodeMap.put(new ErrorCodeIdentifier<>(errorCodeClass), matcherFactory);
         return this;
@@ -306,7 +315,7 @@ public class ErrorHandler {
     }
 
     /**
-     * Clear the ErrorHandler from all it's registered error actions and error matchers.
+     * Clear ErrorHandler instance from all its registered Actions and Matchers.
      */
     public void clear() {
         actions.clear();
@@ -329,13 +338,13 @@ public class ErrorHandler {
         }
     }
 
-    static class Context {
+    private static class Context {
         private HashMap<String, Object> keys = new HashMap<>();
 
-        public boolean handled;
-        public boolean skipDefaults = false;
-        public boolean skipFollowing = false;
-        public boolean skipAlways = false;
+        boolean handled;
+        boolean skipDefaults = false;
+        boolean skipFollowing = false;
+        boolean skipAlways = false;
 
         public Object get(Object key) {
             return keys.get(key);
@@ -349,7 +358,7 @@ public class ErrorHandler {
             return keys.remove(key);
         }
 
-        public void clear() {
+        void clear() {
             keys.clear();
             skipDefaults = false;
             skipFollowing = false;
@@ -365,15 +374,15 @@ public class ErrorHandler {
      * make sure you implement {@link Object#equals(Object)} to allow ErrorHandler
      * perform equality comparisons between instances.
      */
-    static final class ErrorCodeIdentifier<T> {
+    private static final class ErrorCodeIdentifier<T> {
         private T errorCode;
         private Class<T> errorCodeClass;
 
-        public ErrorCodeIdentifier(T errorCode) {
+        ErrorCodeIdentifier(T errorCode) {
             this.errorCode = errorCode;
         }
 
-        public ErrorCodeIdentifier(Class<T> errorCodeClass) {
+        ErrorCodeIdentifier(Class<T> errorCodeClass) {
             this.errorCodeClass = errorCodeClass;
         }
 
