@@ -27,14 +27,13 @@ public class MainActivity extends AppCompatActivity {
     private static final String USERNAME = "charbgr";
 
     private Retrofit retrofit;
-    private Retrofit.Builder builder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        builder = new Retrofit.Builder()
+        Retrofit.Builder builder = new Retrofit.Builder()
                 .client(new OkHttpClient())
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.createWithScheduler(Schedulers.io()))
@@ -44,6 +43,67 @@ public class MainActivity extends AppCompatActivity {
 
         buildErrorHandler();
         initiateAPICall();
+    }
+
+    private void initiateAPICall() {
+        retrofit.create(GithubService.class).searchUser(USERNAME)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<GithubUser>() {
+                    @Override
+                    public void onCompleted() {
+                        //nothing here
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        handleWithErrorHandler(e);
+                        handleWithoutErrorHandler(e);
+                    }
+
+                    @Override
+                    public void onNext(GithubUser githubUser) {
+                        System.out.println(githubUser);
+                    }
+                });
+    }
+
+    private void handleWithErrorHandler(Throwable e) {
+        ErrorHandler
+                .create()
+                .on(404, new Action() {
+                    @Override
+                    public void execute(Throwable throwable, ErrorHandler errorHandler) {
+                        //We prefer to handle 404 specifically on this API call
+
+                        /*
+                        * We would also like to skip the execution of default ErrorHandler's
+                        * on(404, Action) method
+                        * */
+                        errorHandler.skipDefaults();
+
+                        /*
+                        * We would also like to skip the execution of default ErrorHandler's
+                        * always(Action) method
+                        * */
+                        errorHandler.skipAlways();
+
+                    }
+                })
+                .handle(e);
+    }
+
+    private void handleWithoutErrorHandler(Throwable e) {
+        /*
+        * All handling code of the Throwable here would be probably duplicated
+        * in more places throughout our code, for other API calls.
+        * */
+        HttpException httpException = (HttpException) e;
+
+        if (httpException.code() == 404) {
+            //Do something for 404
+        } else if (httpException.code() == 500) {
+            //Do something for 500
+        }
     }
 
     private void buildErrorHandler() {
@@ -58,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
                 .on(404, new Action() {
                     @Override
                     public void execute(Throwable throwable, ErrorHandler errorHandler) {
-                        //Do something with out error here
+                        //Do something with our error here
                     }
                 })
                 .always(new Action() {
@@ -77,47 +137,5 @@ public class MainActivity extends AppCompatActivity {
                 return httpException.code() == code;
             }
         };
-    }
-
-    private void initiateAPICall() {
-        retrofit.create(GithubService.class).searchUser(USERNAME)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<GithubUser>() {
-                    @Override
-                    public void onCompleted() {
-                        //nothing here
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        ErrorHandler
-                                .create()
-                                .on(404, new Action() {
-                                    @Override
-                                    public void execute(Throwable throwable, ErrorHandler errorHandler) {
-                                        //We prefer to handle 404 specifically on this API call
-
-                                        /*
-                                        * We would also like to skip the execution of default ErrorHandler's
-                                        * on(404, Action) method
-                                        * */
-                                        errorHandler.skipDefaults();
-
-                                        /*
-                                        * We would also like to skip the execution of default ErrorHandler's
-                                        * always(Action) method
-                                        * */
-                                        errorHandler.skipAlways();
-
-                                    }
-                                })
-                                .handle(e);
-                    }
-
-                    @Override
-                    public void onNext(GithubUser githubUser) {
-                        System.out.println(githubUser);
-                    }
-                });
     }
 }
