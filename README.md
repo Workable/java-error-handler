@@ -21,73 +21,64 @@ compile 'com.workable:error-handler:0.9'
 
 ## Usage
 
-## Example
-Let's say we're building a messaging app for Android that uses Foo service for crash reporting.
+Let's say we're building an App on Android that uses Network to retrieve messages and store them in a Database.
 
-*WIP*
+### Default Configuration
 
 ```java
 ErrorHandler
   .defaultErrorHandler()
   // bind an error matcher to a code
-  .bindErrorCode("closed:bar", errorCode -> throwable -> {
-      if (throwable instanceof BarException) {
-          return !((BarException) throwable).isOpenBar();
-      } else {
-          return false;
-      }
+  .bindErrorCode(400, errorCode -> throwable -> {
+      return ((HttpException) throwable).code() == 400;
   })
-  // bind an error matcher to a code class, for example integers could designate HTTP errors
-  .bindErrorCodeClass(Integer.class, errorCode -> throwable -> {
-      if (throwable instanceof HttpException) {
-          return ((HttpException) throwable).getHttpStatus() == errorCode;
-      } else {
-          return false;
-      }
+  .bindErrorCode(404, errorCode -> throwable -> {
+      return ((HttpException) throwable).code() == 404;
   })
-  // now let's handle all general, cross-cut or uncommon errors here
-  .on(FooException.class, (throwable, errorHandler) -> {
-    // handle foo errors
+  .bindErrorCode(500, errorCode -> throwable -> {
+      return ((HttpException) throwable).code() == 500;
   })
-  .on(
-    (throwable) -> {
-        try {
-            return NetworkException.class.cast(throwable).isOffline();
-        } catch (ClassCastException ignore) {
-            return false;
-        }
-    },
-    (throwable, errorHandler) -> {
-      // handle offline here  
-    }
-  )
+  .bindErrorCodeClass(DBError.class, errorCode -> throwable -> {
+      return DBError.from(throwable) == DBError.ERRORS.READ_ONLY;
+  })
   .on(500, (throwable, errorHandler) -> {
-    // handle HTTP 500 errors
+    //Handle HTTP 500 errors
+    Toast.makeText(context, "Operation not available!", Toast.LENGTH_SHORT).show();
+  })
+  .on(404, (throwable, errorHandler) -> {
+    //Handle 404 in general  
+    Toast.makeText(context, "Failed to find the requested resource!", Toast.LENGTH_SHORT).show();
   })
   .otherwise((throwable, errorHandler) -> {
-    // handle unknown errors
+    //Handle unknown errors
+    Toast.makeText(context, "Something went wrong. We are fixing it ASAP!", Toast.LENGTH_LONG).show();
   })
   .always((throwable, errorHandler) -> {
-    // log the error
+    Crashlytics.log(throwable);
   });
 ```
 
-Then on a specific part of your app, most probably an action handler inside a sceen, controller etc.
+Then on any Activity inside your app, the Messaging Activity in our case, you write the following.
+
+### Specific error handling
 
 ```java
  ErrorHandler
     .create()
-    .on(FooException.class, (throwable, errorHandler) -> {
-      // handle foo here and don't let the default handler deal with it
-      errorHandler.skipDefaults();
+    .on(404, (throwable, errorHandler) -> {
+        //We handle 404 specifically on this screen and we override the default action
+        Toast.makeText(context, "Failed to find some messages!", Toast.LENGTH_SHORT).show();
+        errorHandler.skipDefaults();
     })
-    .on("closed:bar", (throwable, errorHandler) -> {
-      // handle an error by it's code
+    .on(DBError.ERRORS.READ_ONLY, (throwable, errorHandler) -> {
+        //We could not open our database to write the new messages
+        ScheduledJob.saveMessages(someMessages).execute();
+        //We also don't want to log this error because we expected it and knew how to handle it
+        errorHandler.skipAlways();
     })
-    .on(422, (throwable, errorHandler) -> {
-      // handle the specific validation error at hand
-    });
+    .handle(throwable);
 ```
+
 
 ## API
 
