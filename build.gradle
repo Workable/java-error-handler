@@ -68,16 +68,17 @@ bintray {
     publications = ['mavenJava']
     pkg {
         repo = 'maven'
-        name = 'error-handler'
-        desc = 'A tool for efficiently handling errors in your Java projects'
-        userOrg = user
+        name = 'ErrorHandler'
+        desc = 'Error handling library for Android and Java'
+        userOrg = "workable"
         licenses = ['MIT']
         vcsUrl = 'https://github.com/Workable/java-error-handler'
-        labels = ['java', 'error handling', 'errors', 'android']
+        labels = ['java', 'error handler', 'errors', 'android']
         publicDownloadNumbers = true
         version {
             name = '0.9'
-            desc = 'A tool for efficiently handling errors in your Java projects'
+
+            desc = 'Error handling library for Android and Java'
             vcsTag = '0.9'
             gpg {
                 sign = true //Determines whether to GPG sign the files. The default is false
