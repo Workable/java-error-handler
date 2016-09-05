@@ -216,4 +216,32 @@ public class ErrorHandlerTest extends TestCase {
         Mockito.verifyNoMoreInteractions(actionDelegateMock);
     }
 
+    @Test
+    public void testEnumClassHandling() {
+        InOrder testVerifier = inOrder(actionDelegateMock);
+
+        ErrorHandler
+                .create()
+                .bindErrorCodeClass(DBError.class, errorCode -> throwable -> DBError.from(throwable) == DBError.READ_ONLY)
+                .on(DBError.READ_ONLY, (throwable, errorHandler) -> {
+                    actionDelegateMock.action1();
+                    errorHandler.skipAlways();
+                })
+                .handle(new DBErrorException("read-only", true));
+
+        testVerifier.verify(actionDelegateMock).action1();
+        testVerifier.verifyNoMoreInteractions();
+        Mockito.verifyNoMoreInteractions(actionDelegateMock);
+    }
+
+
+    private enum DBError {
+
+        READ_ONLY,
+        NOTHING;
+
+        public static DBError from(Throwable throwable) {
+            return ((DBErrorException) throwable).isDBError() ? DBError.READ_ONLY : DBError.NOTHING;
+        }
+    }
 }

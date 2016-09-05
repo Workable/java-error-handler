@@ -39,7 +39,7 @@ ErrorHandler
       return ((HttpException) throwable).code() == 500;
   })
   .bindErrorCodeClass(DBError.class, errorCode -> throwable -> {
-      return DBError.from(throwable) == DBError.ERRORS.READ_ONLY;
+      return DBError.from(throwable) == DBError.READ_ONLY;
   })
   .on(500, (throwable, errorHandler) -> {
     //Handle HTTP 500 errors
@@ -70,7 +70,7 @@ Then on any Activity inside your app, the Messaging Activity in our case, you wr
         Toast.makeText(context, "Failed to find some messages!", Toast.LENGTH_SHORT).show();
         errorHandler.skipDefaults();
     })
-    .on(DBError.ERRORS.READ_ONLY, (throwable, errorHandler) -> {
+    .on(DBError.READ_ONLY, (throwable, errorHandler) -> {
         //We could not open our database to write the new messages
         ScheduledJob.saveMessages(someMessages).execute();
         //We also don't want to log this error because we expected it and knew how to handle it
