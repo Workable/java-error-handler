@@ -1,6 +1,6 @@
 # ErrorHandler
 
-[![Travis](https://img.shields.io/travis/workable/java_error_handler.svg)]() [![Bintray](https://img.shields.io/bintray/v/workable/maven/java_error_handler.svg?maxAge=2592000)]()
+[![Travis](https://img.shields.io/travis/workable/java_error_handler.svg)]() [![Bintray](https://img.shields.io/bintray/v/workable/maven/ErrorHandler.svg?maxAge=2592000)](https://bintray.com/workable/maven/ErrorHandler)
 
 > Error handling library for Android and Java
 
@@ -21,11 +21,14 @@ compile 'com.workable:error-handler:0.9'
 
 ## Usage
 
-Let's say we're building an App on Android that uses Network to retrieve messages and store them in a Database.
+Let's say we're building a messaging Android app that uses both the network and a local database.
 
-### Default Configuration
+### Configure Defaults
 
 ```java
+// Configure the default ErrorHandler to define your global/default error handling logic
+// i.e. somewhere inside MessagingApp.java
+
 ErrorHandler
   .defaultErrorHandler()
   // bind an error matcher to a code
@@ -58,12 +61,15 @@ ErrorHandler
   });
 ```
 
-Then on any Activity inside your app, the Messaging Activity in our case, you write the following.
-
-### Specific error handling
+### Handle an Error
 
 ```java
- ErrorHandler
+// Configure a new ErrorHandler instance that delegates to the default one, for a specific method call
+// i.e. somewhere inside MessageListActivity.java
+try {
+  fetchNewMessages();
+} catch (Exception ex) {
+  ErrorHandler
     .create()
     .on(404, (throwable, errorHandler) -> {
         //We handle 404 specifically on this screen and we override the default action
@@ -76,8 +82,13 @@ Then on any Activity inside your app, the Messaging Activity in our case, you wr
         //We also don't want to log this error because we expected it and knew how to handle it
         errorHandler.skipAlways();
     })
-    .handle(throwable);
+    .handle(ex);
+}
 ```
+
+### Things to know
+
+ErrorHandler is __thread-safe__
 
 
 ## API
@@ -95,7 +106,6 @@ create()
 ```
 
 > Get the default ErrorHandler instance. If there is not one available, it creates a new Instance.
-> *Warning:* This method is synchronized, so be careful when you try to retrieve it from multiple Threads.
 
 ```java
 defaultErrorHandler()
