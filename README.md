@@ -1,11 +1,12 @@
 # ErrorHandler
-
-[![Travis](https://img.shields.io/travis/workable/java_error_handler.svg)]() [![Bintray](https://img.shields.io/bintray/v/workable/maven/ErrorHandler.svg?maxAge=2592000)](https://bintray.com/workable/maven/ErrorHandler)
+[![Download](https://api.bintray.com/packages/workable/maven/ErrorHandler/images/download.svg) ](https://bintray.com/workable/maven/ErrorHandler/_latestVersion)
+[![Bintray](https://img.shields.io/bintray/v/workable/maven/ErrorHandler.svg?maxAge=2592000)](https://bintray.com/workable/maven/ErrorHandler)
+[![Travis](https://img.shields.io/travis/workable/java_error_handler.svg)]() 
 
 > Error handling library for Android and Java
 
 ## Download
-Download the  or grab via Maven:
+Download the [latest JAR](https://bintray.com/workable/maven/ErrorHandler/_latestVersion) or grab via Maven:
 ```xml
 <dependency>
   <groupId>com.workable</groupId>
@@ -15,7 +16,7 @@ Download the  or grab via Maven:
 </dependency>
 ```
 or Gradle:
-```groovy
+```groovyd
 compile 'com.workable:error-handler:0.9'
 ```
 
@@ -191,7 +192,7 @@ One way to classify errors can be by how they relate to the [problem domain](htt
 
 Another way to classify errors is by their **scope**. Are they **common** throughout the application or **specific** to a single screen, object or even method? Think of `UnauthorizedException` versus `InvalidPasswordException`.
 
-And let's not forget another very simple distintion between errors. Those that are known at authoring time and thus **expected** (despite of how probable is that they occur), and those that are **unknown** until runtime.
+And let's not forget another very simple distinction between errors. Those that are known at authoring time and thus **expected** (despite of how probable is that they occur), and those that are **unknown** until runtime.
 
 With that in mind, we usually want to:
 
