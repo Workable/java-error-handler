@@ -60,7 +60,12 @@ publishing {
 
 
 Properties localProps = new Properties()
-localProps.load(project.file('local.properties').newDataInputStream())
+
+try {
+    localProps.load(project.file('local.properties').newDataInputStream())
+} catch(Exception ex) {
+    logger.warn('local.properties file is missing')
+}
 
 bintray {
     user = localProps.getProperty('bintrayUser')
