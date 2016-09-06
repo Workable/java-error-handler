@@ -7,14 +7,7 @@ package com.workable.errorhandler;
  */
 public class DBErrorException extends Exception {
 
-    private boolean isDBError;
-
-    public DBErrorException(String message, boolean isDBError) {
+    public DBErrorException(String message) {
         super(message);
-        this.isDBError = isDBError;
-    }
-
-    public boolean isDBError() {
-        return isDBError;
     }
 }

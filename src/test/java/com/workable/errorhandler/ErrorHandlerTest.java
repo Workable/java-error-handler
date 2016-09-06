@@ -222,26 +222,37 @@ public class ErrorHandlerTest extends TestCase {
 
         ErrorHandler
                 .create()
-                .bindErrorCodeClass(DBError.class, errorCode -> throwable -> DBError.from(throwable) == DBError.READ_ONLY)
+                .bindErrorCodeClass(DBError.class, errorCode -> throwable -> {
+                    if (throwable instanceof DBErrorException) {
+                        return DBError.from((DBErrorException)throwable) == errorCode;
+                    }
+                    return false;
+                })
                 .on(DBError.READ_ONLY, (throwable, errorHandler) -> {
                     actionDelegateMock.action1();
                     errorHandler.skipAlways();
                 })
-                .handle(new DBErrorException("read-only", true));
+                .handle(new DBErrorException("read-only"));
 
         testVerifier.verify(actionDelegateMock).action1();
         testVerifier.verifyNoMoreInteractions();
         Mockito.verifyNoMoreInteractions(actionDelegateMock);
     }
 
-
     private enum DBError {
-
         READ_ONLY,
-        NOTHING;
+        DEADLOCK,
+        FATAL;
 
-        public static DBError from(Throwable throwable) {
-            return ((DBErrorException) throwable).isDBError() ? DBError.READ_ONLY : DBError.NOTHING;
+        public static DBError from(DBErrorException error) {
+            switch (error.getMessage()) {
+                case "read-only":
+                    return DBError.READ_ONLY;
+                case "deadlock":
+                    return DBError.DEADLOCK;
+                default:
+                    return DBError.FATAL;
+            }
         }
     }
 }
