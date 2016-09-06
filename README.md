@@ -24,45 +24,80 @@ compile 'com.workable:error-handler:0.9'
 
 Let's say we're building a messaging Android app that uses both the network and a local database.
 
-### Configure Defaults
+We need to:
+
+### Setup a default ErrorHandler once
+
+ - Configure the default ErrorHandler
+ - Alias errors to codes that are easier to use like Integer, String and Enum values
+ - Map errors to actions to take when those errors occur (exceptions thrown)
 
 ```java
-// Configure the default ErrorHandler to define your global/default error handling logic
-// i.e. somewhere inside MessagingApp.java
+// somewhere inside MessagingApp.java
 
 ErrorHandler
   .defaultErrorHandler()
-  // bind an error matcher to a code
-  .bindErrorCode(400, errorCode -> throwable -> {
-      return ((HttpException) throwable).code() == 400;
+  
+  // Bind certain exceptions to "offline"
+  .bindErrorCode("offline", errorCode -> throwable -> {
+      return throwable instanceof UnknownHostException || throwable instanceof ConnectException;
   })
+  
+  // Bind HTTP 404 status to 404
   .bindErrorCode(404, errorCode -> throwable -> {
       return ((HttpException) throwable).code() == 404;
   })
+  
+  // Bind HTTP 500 status to 500
   .bindErrorCode(500, errorCode -> throwable -> {
       return ((HttpException) throwable).code() == 500;
   })
+  
+  // Bind all DB errors to a custom enumeration
   .bindErrorCodeClass(DBError.class, errorCode -> throwable -> {
-      return DBError.from(throwable) == DBError.READ_ONLY;
+      return DBError.from(throwable) == errorCode;
   })
+  
+  // Handle HTTP 500 errors
   .on(500, (throwable, errorHandler) -> {
-    //Handle HTTP 500 errors
     Toast.makeText(context, "Operation not available!", Toast.LENGTH_SHORT).show();
   })
+  
+  // Handle HTTP 404 errors
   .on(404, (throwable, errorHandler) -> {
-    //Handle 404 in general  
     Toast.makeText(context, "Failed to find the requested resource!", Toast.LENGTH_SHORT).show();
   })
+  
+  // Handle "offline" errors
+  .on("offline", (throwable, errorHandler) -> {
+    Toast.makeText(context, "Operation not available when offline", Toast.LENGTH_SHORT).show();
+  })
+  
+  // Handle unknown errors
   .otherwise((throwable, errorHandler) -> {
-    //Handle unknown errors
     Toast.makeText(context, "Something went wrong. We are fixing it ASAP!", Toast.LENGTH_LONG).show();
   })
+  
+  // Always log to a crash/error reporting service
   .always((throwable, errorHandler) -> {
     Crashlytics.log(throwable);
   });
 ```
 
-### Handle an Error
+### Use ErrorHandler inside catch blocks
+
+```java
+// ErrorHandler instances created using ErrorHandler#create(), delegate to the default ErrorHandler
+// So it's actually a "handle the error using defaults"
+// i.e. somewhere inside MessageListActivity.java
+try {
+  fetchNewMessages();
+} catch (Exception ex) {
+  ErrorHandler.create().handle(ex);
+}
+```
+
+### Override defaults when needed
 
 ```java
 // Configure a new ErrorHandler instance that delegates to the default one, for a specific method call
