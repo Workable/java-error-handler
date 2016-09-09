@@ -16,6 +16,7 @@ ErrorHandler
 
 ErrorHandler
   .create()
+  .bindErrorCodeClass(Range.class, RetrofitMatcherFactory.createRange())
   .bindErrorCodeClass(Integer.class, RetrofitMatcherFactory.create())
   .on(400, (throwable, errorHandler) -> showErrorMessage("what?"))
   .on(Range.of(500, 599), (throwable, errorHandler) -> showErrorMessage("kaboom"))
