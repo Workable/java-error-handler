@@ -1,0 +1,18 @@
+group 'com.workable'
+version '0.9'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.7
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile 'org.mockito:mockito-core:1.10.19'
+
+    compile project(':errorhandler')
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
+}
