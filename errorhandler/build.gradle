@@ -9,7 +9,7 @@ plugins {
 }
 
 group 'com.workable'
-version '0.9-SNAPSHOT'
+version '0.9.1'
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
@@ -41,7 +41,7 @@ publishing {
         mavenJava(MavenPublication) {
             groupId 'com.workable'
             artifactId 'error-handler'
-            version '0.9'
+            version '0.9.1'
 
             from components.java
 
@@ -81,10 +81,10 @@ bintray {
         labels = ['java', 'error handler', 'errors', 'android']
         publicDownloadNumbers = true
         version {
-            name = '0.9'
+            name = '0.9.1'
 
             desc = 'Error handling library for Android and Java'
-            vcsTag = '0.9'
+            vcsTag = '0.9.1'
             gpg {
                 sign = true //Determines whether to GPG sign the files. The default is false
             }
