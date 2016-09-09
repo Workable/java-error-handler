@@ -62,7 +62,7 @@ publishing {
 Properties localProps = new Properties()
 
 try {
-    localProps.load(project.file('local.properties').newDataInputStream())
+    localProps.load(project.file('../local.properties').newDataInputStream())
 } catch(Exception ex) {
     logger.warn('local.properties file is missing')
 }
