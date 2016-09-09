@@ -1,0 +1,2 @@
+rootProject.name = 'retrofit-rx-matcher'
+include ':errorhandler'

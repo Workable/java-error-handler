@@ -1,7 +1,7 @@
 # ErrorHandler
 [![Download](https://api.bintray.com/packages/workable/maven/ErrorHandler/images/download.svg) ](https://bintray.com/workable/maven/ErrorHandler/_latestVersion)
 [![Bintray](https://img.shields.io/bintray/v/workable/maven/ErrorHandler.svg?maxAge=2592000)](https://bintray.com/workable/maven/ErrorHandler)
-[![Travis](https://travis-ci.org/Workable/java-error-handler.svg?branch=master)]() 
+[![Travis](https://travis-ci.org/Workable/java-error-handler.svg?branch=master)]()
 
 > Error handling library for Android and Java
 
@@ -16,7 +16,8 @@ Download the [latest JAR](https://bintray.com/workable/maven/ErrorHandler/_lates
 </dependency>
 ```
 or Gradle:
-```groovyd
+
+```groovy
 compile 'com.workable:error-handler:0.9'
 ```
 
@@ -37,50 +38,50 @@ We need to:
 
 ErrorHandler
   .defaultErrorHandler()
-  
+
   // Bind certain exceptions to "offline"
   .bindErrorCode("offline", errorCode -> throwable -> {
       return throwable instanceof UnknownHostException || throwable instanceof ConnectException;
   })
-  
+
   // Bind HTTP 404 status to 404
   .bindErrorCode(404, errorCode -> throwable -> {
       return ((HttpException) throwable).code() == 404;
   })
-  
+
   // Bind HTTP 500 status to 500
   .bindErrorCode(500, errorCode -> throwable -> {
       return ((HttpException) throwable).code() == 500;
   })
-  
+
   // Bind all DB errors to a custom enumeration
   .bindErrorCodeClass(DBError.class, errorCode -> throwable -> {
       return DBError.from(throwable) == errorCode;
   })
-  
+
   // Handle HTTP 500 errors
   .on(500, (throwable, errorHandler) -> {
-    Toast.makeText(context, "Operation not available!", Toast.LENGTH_SHORT).show();
+    displayAlert("Kaboom!");
   })
-  
+
   // Handle HTTP 404 errors
   .on(404, (throwable, errorHandler) -> {
-    Toast.makeText(context, "Failed to find the requested resource!", Toast.LENGTH_SHORT).show();
+    displayAlert("Not found!");
   })
-  
+
   // Handle "offline" errors
   .on("offline", (throwable, errorHandler) -> {
-    Toast.makeText(context, "Operation not available when offline", Toast.LENGTH_SHORT).show();
+    displayAlert("Network dead!");
   })
-  
+
   // Handle unknown errors
   .otherwise((throwable, errorHandler) -> {
-    Toast.makeText(context, "Something went wrong. We are fixing it ASAP!", Toast.LENGTH_LONG).show();
+    displayAlert("Oooops?!");
   })
-  
+
   // Always log to a crash/error reporting service
   .always((throwable, errorHandler) -> {
-    Crashlytics.log(throwable);
+    Logger.log(throwable);
   });
 ```
 
@@ -88,7 +89,7 @@ ErrorHandler
 
 ```java
 // ErrorHandler instances created using ErrorHandler#create(), delegate to the default ErrorHandler
-// So it's actually a "handle the error using defaults"
+// So it's actually a "handle the error using only defaults"
 // i.e. somewhere inside MessageListActivity.java
 try {
   fetchNewMessages();
@@ -107,15 +108,19 @@ try {
 } catch (Exception ex) {
   ErrorHandler
     .create()
+    .on(StaleDataException.class, (throwable, errorHandler) -> {
+        reloadList();
+        errorHandler.skipDefaults();
+    })
     .on(404, (throwable, errorHandler) -> {
-        //We handle 404 specifically on this screen and we override the default action
-        Toast.makeText(context, "Failed to find some messages!", Toast.LENGTH_SHORT).show();
+        // We handle 404 specifically on this screen by overriding the default action
+        displayAlert("Could not load new messages");
         errorHandler.skipDefaults();
     })
     .on(DBError.READ_ONLY, (throwable, errorHandler) -> {
-        //We could not open our database to write the new messages
+        // We could not open our database to write the new messages
         ScheduledJob.saveMessages(someMessages).execute();
-        //We also don't want to log this error because we expected it and knew how to handle it
+        // We also don't want to log this error because ...
         errorHandler.skipAlways();
     })
     .handle(ex);
@@ -124,100 +129,46 @@ try {
 
 ### Things to know
 
-ErrorHandler is __thread-safe__
+ErrorHandler is __thread-safe__.
 
 
 ## API
 
-> Create a new Instance of ErrorHandler with no default ErrorHandler.
+### Initialize
 
-```java
-createIsolated()
-```
+* `defaultErrorHandler()` Get the default ErrorHandler.
 
-> Create a new Instance of ErrorHandler that will use the default ErrorHandler (if set).
+* `create()` Create a new ErrorHandler that is linked to the default one.
 
-```java
-create()
-```
+* `createIsolated()` Create a new empty ErrorHandler that is not linked to the default one.
 
-> Get the default ErrorHandler instance. If there is not one available, it creates a new Instance.
+### Configure
 
-```java
-defaultErrorHandler()
-```
+* `on(Matcher, Action)` Register an _Action_ to be executed if _Matcher_ matches the error.
 
-> _Action_ will be executed if a given Throwable matches with _Matcher_.
+* `on(Class<? extends Exception>, Action)` Register an _Action_ to be executed if error is an instance of `Exception`.
 
-```java
-on(Matcher, Action)
-```
+* `on(T, Action)` Register an _Action_ to be executed if error is bound to T, through `bindErrorCode()` or `bindErrorCodeClass()`.
 
-> _Action_ will be executed if a given Throwable is an instance of _<? extends Exception>_.
+* `otherwise(Action)` Register an _Action_ to be executed only if no other _Action_ gets executed.
 
-```java
-on(Class<? extends Exception>, Action)
-```
+* `always(Action)` Register an _Action_ to be executed always and after all other actions. Works like a `finally` clause.
 
-> _Action_ will be executed if a given Throwable is bound to T, through `bindErrorCode()`.
+* `skipFollowing()`  Skip the execution of any subsequent _Actions_ except those registered via `always()`.
 
-```java
-on(T, Action)
-```
+* `skipAlways()` Skip all _Actions_ registered via `always()`.
 
-> _Action_ will be executed if no previous _Action_ has been executed.
+* `skipDefaults()` Skip any default actions. Meaning any actions registered on the `defaultErrorHandler` instance.
 
-```java
-otherwise(Action)
-```
+* `bindErrorCode(T, MatcherFactory<T>)` Bind instances of _T_ to match errors through a matcher provided by _MatcherFactory_.
 
-> _Action_ will be executed for every given Throwable.
+* `bindErrorCodeClass(Class<T>, MatcherFactory<T>)` Bind class _T_ to match errors through a matcher provided by _MatcherFactory_.
 
-```java
-always(Action)
-```
+* `clear()` Clear all registered _Actions_.
 
-> Instruct the current ErrorHandler instance to skip the execution of subsequent registered _Actions_, through `on()`.
+### Execute
 
-```java
-skipFollowing()
-```
-
-> Instruct the current ErrorHandler instance to skip the execution of subsequent registered _Actions_ through `always()`.
-
-```java
-skipAlways()
-```
-
-> Instruct the current ErrorHandler instance to skip the execution of registered _Actions_ on the _defaultErrorHandler_ instance.
-
-```java
-skipDefaults()
-```
-
-> The _Throwable_ that we should act upon.
-
-```java
-handle(Throwable)
-```
-
-> Bind a _MatcherFactory_ to _T_.
-
-```java
-bindErrorCode(T, MatcherFactory)
-```
-
-> Bind a _MatcherFactory_ to _Class<T>_.
-
-```java
-bindErrorCodeClass(Class<T>, MatcherFactory)
-```
-
-> Clear current ErrorHandler instance from all _Actions_ and _Matchers_.
-
-```java
-clear()
-```
+* `handle(Throwable)` Handle the given error.
 
 
 ## About
@@ -239,7 +190,7 @@ With that in mind, we usually want to:
 
 Java, as a language, provides you with a way to do the above. By mapping exceptional or very common errors to runtime exceptions and catching them lower in the call stack, while having specific expected errors mapped to checked exceptions and handle them near where the error occurred. Still, countless are the projects where this simple strategy has gone astray with lots of errors being either swallowed or left for the catch-all `Thread.UncaughtExceptionHandler`. Moreover, it usually comes with significant boilerplate code. `ErrorHandler` however eases this practice through its fluent API, error aliases and defaults mechanism.
 
-This library doesn't try to solve Java specific problems, although it does help with the `log and shallow` anti-pattern as it provides an opinionated and straightforward way to act inside every `catch` block.  It was created for the needs of an Android app and proved itself useful very quickly. So it may work for you as well. If you like the concept and you're developing in  _Swift_ or _Javascript_, we're baking em and will be available really soon.
+This library doesn't try to solve Java specific problems, although it does help with the `log and shallow` anti-pattern as it provides an opinionated and straightforward way to act inside every `catch` block.  It was created for the needs of an Android app and proved itself useful very quickly. So it may work for you as well. If you like the concept and you're developing in  _Swift_ or _Javascript_, we're baking 'em and will be available really soon.
 
 ## License
 ```
