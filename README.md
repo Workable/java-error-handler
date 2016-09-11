@@ -24,6 +24,19 @@ compile 'com.workable:error-handler:0.9'
 
 _*hosted on JCenter repository_
 
+You can also get the latest release 0.9.1 by adding the following in your *root* `build.gradle` file:
+```groovy
+maven {
+  url  "http://dl.bintray.com/workable/maven" 
+}
+```
+
+And then add the following dependency:
+
+```groovy
+compile 'com.workable:error-handler:0.9.1'
+```
+
 ## Usage
 
 Let's say we're building a messaging Android app that uses both the network and a local database.
