@@ -11,7 +11,7 @@ Download the [latest JAR](https://bintray.com/workable/maven/ErrorHandler/_lates
 <dependency>
   <groupId>com.workable</groupId>
   <artifactId>error-handler</artifactId>
-  <version>0.9</version>
+  <version>0.9.1</version>
   <type>pom</type>
 </dependency>
 ```
@@ -19,23 +19,9 @@ Download the [latest JAR](https://bintray.com/workable/maven/ErrorHandler/_lates
 or Gradle:
 
 ```groovy
-compile 'com.workable:error-handler:0.9'
-```
-
-_*hosted on JCenter repository_
-
-You can also get the latest release 0.9.1 by adding the following in your *root* `build.gradle` file:
-```groovy
-maven {
-  url  "http://dl.bintray.com/workable/maven" 
-}
-```
-
-And then add the following dependency:
-
-```groovy
 compile 'com.workable:error-handler:0.9.1'
 ```
+
 
 ## Usage
 
