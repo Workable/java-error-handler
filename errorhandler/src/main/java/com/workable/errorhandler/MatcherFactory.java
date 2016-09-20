@@ -27,7 +27,7 @@ package com.workable.errorhandler;
 /**
  * A functional interface for {@link Matcher} factories
  *
- * @author Stratos Pavlakis <pavlakis@workable.com>
+ * @author Stratos Pavlakis - pavlakis@workable.com
  */
 public interface MatcherFactory<T> {
 

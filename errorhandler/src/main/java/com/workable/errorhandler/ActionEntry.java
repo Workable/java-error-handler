@@ -71,6 +71,7 @@ public class ActionEntry {
      *
      * @param matcher the matcher object in the ActionEntry
      * @param action  the action object in the ActionEntry
+     * @return a new ActionEntry
      */
     public static ActionEntry from(Matcher matcher, Action action) {
         return new ActionEntry(matcher, action);
