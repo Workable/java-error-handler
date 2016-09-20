@@ -28,7 +28,7 @@ package com.workable.errorhandler;
  * Runtime exception to indicate that the user tried to register
  * an {@link Action} via {@link ErrorHandler#on(Object, Action)} with an unknown error code.
  *
- * @author Stratos Pavlakis <pavlakis@workable.com
+ * @author Stratos Pavlakis - pavlakis@workable.com
  */
 public class UnknownErrorCodeException extends RuntimeException {
 

@@ -36,6 +36,11 @@ task sourceJar(type: Jar) {
     from sourceSets.main.allJava
 }
 
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -47,6 +52,10 @@ publishing {
 
             artifact sourceJar {
                 classifier "sources"
+            }
+
+            artifact javadocJar {
+                classifier "javadoc"
             }
         }
     }
