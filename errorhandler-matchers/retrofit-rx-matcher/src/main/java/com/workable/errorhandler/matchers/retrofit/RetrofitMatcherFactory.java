@@ -5,6 +5,7 @@ import com.workable.errorhandler.MatcherFactory;
 import retrofit2.adapter.rxjava.HttpException;
 
 
+
 public class RetrofitMatcherFactory {
 
     private RetrofitMatcherFactory() {
@@ -20,7 +21,8 @@ public class RetrofitMatcherFactory {
             public Matcher build(final Integer httpStatusCode) {
                 return new Matcher() {
                     public boolean matches(Throwable throwable) {
-                        return ((HttpException) throwable).code() == httpStatusCode;
+                       return throwable instanceof HttpException &&
+                               ((HttpException) throwable).code() == httpStatusCode;
                     }
                 };
             }
@@ -36,8 +38,8 @@ public class RetrofitMatcherFactory {
             public Matcher build(final Range range) {
                 return new Matcher() {
                     public boolean matches(Throwable throwable) {
-                        HttpException httpException = (HttpException)throwable;
-                        return range.contains(httpException.code());
+                        return throwable instanceof HttpException &&
+                                range.contains(((HttpException)throwable).code());
                     }
                 };
             }
