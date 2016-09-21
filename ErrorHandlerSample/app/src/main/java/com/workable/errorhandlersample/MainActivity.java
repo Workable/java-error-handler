@@ -2,15 +2,21 @@ package com.workable.errorhandlersample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.workable.errorhandler.Action;
 import com.workable.errorhandler.ErrorHandler;
-import com.workable.errorhandler.Matcher;
-import com.workable.errorhandler.MatcherFactory;
 import com.workable.errorhandlersample.models.GithubUser;
 import com.workable.errorhandlersample.retrofit.GithubService;
 import com.workable.errorhandlersample.retrofit.Routes;
+
+import java.net.UnknownHostException;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -23,15 +29,19 @@ import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
-    private static final String USERNAME = "charbgr";
+    private static final String USERNAME = "charbgrfsdfds";
 
     private Retrofit retrofit;
+    private TextView githubUsername;
+    private EditText searchTerm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        githubUsername = (TextView) findViewById(R.id.found_username);
+        searchTerm = (EditText) findViewById(R.id.github_username);
 
         Retrofit.Builder builder = new Retrofit.Builder()
                 .client(new OkHttpClient())
@@ -41,12 +51,27 @@ public class MainActivity extends AppCompatActivity {
 
         retrofit = builder.build();
 
-        buildErrorHandler();
-        initiateAPICall();
+        initIMEActionListener();
     }
 
-    private void initiateAPICall() {
-        retrofit.create(GithubService.class).searchUser(USERNAME)
+    private void initIMEActionListener() {
+        searchTerm.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+        searchTerm.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE) {
+                    initiateAPICall(v.getText().toString());
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    private void initiateAPICall(String username) {
+        retrofit
+                .create(GithubService.class)
+                .searchUser(username)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<GithubUser>() {
                     @Override
@@ -57,12 +82,11 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onError(Throwable e) {
                         handleWithErrorHandler(e);
-                        handleWithoutErrorHandler(e);
                     }
 
                     @Override
                     public void onNext(GithubUser githubUser) {
-                        System.out.println(githubUser);
+                        showUser(githubUser);
                     }
                 });
     }
@@ -73,23 +97,37 @@ public class MainActivity extends AppCompatActivity {
                 .on(404, new Action() {
                     @Override
                     public void execute(Throwable throwable, ErrorHandler errorHandler) {
-                        //We prefer to handle 404 specifically on this API call
-
-                        /*
-                        * We would also like to skip the execution of default ErrorHandler's
-                        * on(404, Action) method
-                        * */
-                        errorHandler.skipDefaults();
-
-                        /*
-                        * We would also like to skip the execution of default ErrorHandler's
-                        * always(Action) method
-                        * */
-                        errorHandler.skipAlways();
-
+                        showMessage("KABOOM!!! User not found!");
+                    }
+                })
+                .on("offline", new Action() {
+                    @Override
+                    public void execute(Throwable throwable, ErrorHandler errorHandler) {
+                        showMessage("Network dead!");
+                    }
+                })
+                .always(new Action() {
+                    @Override
+                    public void execute(Throwable throwable, ErrorHandler errorHandler) {
+                        githubUsername.setText("");
                     }
                 })
                 .handle(e);
+    }
+
+    private void showUser(GithubUser githubUser) {
+        if (githubUser == null) return;
+
+        githubUsername.setText(githubUser.getName());
+        githubUsername.append("\n");
+        githubUsername.append(githubUser.getUrl());
+        githubUsername.append("\n");
+        githubUsername.append(githubUser.getEmail());
+
+    }
+
+    private void showMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
     private void handleWithoutErrorHandler(Throwable e) {
@@ -104,38 +142,5 @@ public class MainActivity extends AppCompatActivity {
         } else if (httpException.code() == 500) {
             //Do something for 500
         }
-    }
-
-    private void buildErrorHandler() {
-        ErrorHandler
-                .defaultErrorHandler()
-                .bindErrorCode(404, new MatcherFactory<Integer>() {
-                    @Override
-                    public Matcher build(Integer errorCode) {
-                        return buildRetrofitMatcher(errorCode);
-                    }
-                })
-                .on(404, new Action() {
-                    @Override
-                    public void execute(Throwable throwable, ErrorHandler errorHandler) {
-                        //Do something with our error here
-                    }
-                })
-                .always(new Action() {
-                    @Override
-                    public void execute(Throwable throwable, ErrorHandler errorHandler) {
-                        Log.e(TAG, "We are logging an error here", throwable);
-                    }
-                });
-    }
-
-    private Matcher buildRetrofitMatcher(final int code) {
-        return new Matcher() {
-            @Override
-            public boolean matches(Throwable throwable) {
-                HttpException httpException = (HttpException) throwable;
-                return httpException.code() == code;
-            }
-        };
     }
 }

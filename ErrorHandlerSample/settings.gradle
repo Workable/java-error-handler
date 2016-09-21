@@ -1,1 +1,1 @@
-include ':app', ':error-handler'
+include ':app'
