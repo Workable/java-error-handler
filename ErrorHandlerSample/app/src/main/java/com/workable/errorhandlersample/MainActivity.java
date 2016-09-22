@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Range;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -104,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void execute(Throwable throwable, ErrorHandler errorHandler) {
                         showMessage("Network dead!");
+                        errorHandler.skipDefaults();
                     }
                 })
                 .always(new Action() {
@@ -128,19 +130,5 @@ public class MainActivity extends AppCompatActivity {
 
     private void showMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-    }
-
-    private void handleWithoutErrorHandler(Throwable e) {
-        /*
-        * All handling code of the Throwable here would be probably duplicated
-        * in more places throughout our code, for other API calls.
-        * */
-        HttpException httpException = (HttpException) e;
-
-        if (httpException.code() == 404) {
-            //Do something for 404
-        } else if (httpException.code() == 500) {
-            //Do something for 500
-        }
     }
 }

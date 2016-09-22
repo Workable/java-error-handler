@@ -2,6 +2,7 @@ package com.workable.errorhandlersample;
 
 import android.app.Application;
 import android.util.Log;
+import android.util.Range;
 
 import com.workable.errorhandler.Action;
 import com.workable.errorhandler.ErrorHandler;
@@ -65,7 +66,8 @@ public class GithubApp extends Application {
         return new Matcher() {
             @Override
             public boolean matches(Throwable throwable) {
-                return throwable instanceof UnknownHostException || throwable instanceof ConnectException;
+                return throwable instanceof UnknownHostException
+                        || throwable instanceof ConnectException;
             }
         };
     }
