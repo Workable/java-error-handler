@@ -14,7 +14,8 @@ public class RetrofitMatcherFactory {
 
     /**
      * Creates a {@link MatcherFactory} that checks HTTP statuses
-     * @return
+     *
+     * @return new MatcherFactory for Retrofit Rx HttpException that works with Integer
      */
     public static MatcherFactory<Integer> create() {
         return new MatcherFactory<Integer>() {
@@ -31,7 +32,8 @@ public class RetrofitMatcherFactory {
 
     /**
      * Creates a {@link MatcherFactory} that checks if HTTP status is in given {@link Range}
-     * @return
+     *
+     * @return new MatcherFactory for Retrofit Rx HttpException that works with Range
      */
     public static MatcherFactory<Range> createRange() {
         return new MatcherFactory<Range>() {
