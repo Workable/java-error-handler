@@ -11,7 +11,7 @@ Download the [latest JAR](https://bintray.com/workable/maven/ErrorHandler/_lates
 <dependency>
   <groupId>com.workable</groupId>
   <artifactId>error-handler</artifactId>
-  <version>0.9.1</version>
+  <version>1.0.0</version>
   <type>pom</type>
 </dependency>
 ```
@@ -19,7 +19,7 @@ Download the [latest JAR](https://bintray.com/workable/maven/ErrorHandler/_lates
 or Gradle:
 
 ```groovy
-compile 'com.workable:error-handler:0.9.1'
+compile 'com.workable:error-handler:1.0.0'
 ```
 
 
@@ -42,22 +42,22 @@ ErrorHandler
   .defaultErrorHandler()
 
   // Bind certain exceptions to "offline"
-  .bindErrorCode("offline", errorCode -> throwable -> {
+  .bind("offline", errorCode -> throwable -> {
       return throwable instanceof UnknownHostException || throwable instanceof ConnectException;
   })
 
   // Bind HTTP 404 status to 404
-  .bindErrorCode(404, errorCode -> throwable -> {
+  .bind(404, errorCode -> throwable -> {
       return ((HttpException) throwable).code() == 404;
   })
 
   // Bind HTTP 500 status to 500
-  .bindErrorCode(500, errorCode -> throwable -> {
+  .bind(500, errorCode -> throwable -> {
       return ((HttpException) throwable).code() == 500;
   })
 
   // Bind all DB errors to a custom enumeration
-  .bindErrorCodeClass(DBError.class, errorCode -> throwable -> {
+  .bindClass(DBError.class, errorCode -> throwable -> {
       return DBError.from(throwable) == errorCode;
   })
 
@@ -98,6 +98,12 @@ try {
 } catch (Exception ex) {
   ErrorHandler.create().handle(ex);
 }
+```
+
+### Run blocks of code using ErrorHandler.run
+
+```java
+  ErrorHandler.run(() -> fetchNewMessages());
 ```
 
 ### Override defaults when needed
@@ -150,7 +156,7 @@ ErrorHandler is __thread-safe__.
 
 * `on(Class<? extends Exception>, Action)` Register an _Action_ to be executed if error is an instance of `Exception`.
 
-* `on(T, Action)` Register an _Action_ to be executed if error is bound to T, through `bindErrorCode()` or `bindErrorCodeClass()`.
+* `on(T, Action)` Register an _Action_ to be executed if error is bound to T, through `bind()` or `bindClass()`.
 
 * `otherwise(Action)` Register an _Action_ to be executed only if no other _Action_ gets executed.
 
@@ -162,9 +168,9 @@ ErrorHandler is __thread-safe__.
 
 * `skipDefaults()` Skip any default actions. Meaning any actions registered on the `defaultErrorHandler` instance.
 
-* `bindErrorCode(T, MatcherFactory<T>)` Bind instances of _T_ to match errors through a matcher provided by _MatcherFactory_.
+* `bind(T, MatcherFactory<T>)` Bind instances of _T_ to match errors through a matcher provided by _MatcherFactory_.
 
-* `bindErrorCodeClass(Class<T>, MatcherFactory<T>)` Bind class _T_ to match errors through a matcher provided by _MatcherFactory_.
+* `bindClass(Class<T>, MatcherFactory<T>)` Bind class _T_ to match errors through a matcher provided by _MatcherFactory_.
 
 * `clear()` Clear all registered _Actions_.
 
