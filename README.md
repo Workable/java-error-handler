@@ -185,9 +185,12 @@ ErrorHandler is __thread-safe__.
 
 When designing for errors, we usually need to:
 
-1. have a **default** handler for every **expected** error (i.e. network, subscription errors)
-2. handle **specific** errors **as appropriate** based on where and when they occur (i.e. network error while uploading a file, invalid login)
-3. have a **catch-all** handler for **unknown** errors (i.e. system libraries runtime errors we don't anticipate)
+1. have a **default** handler for every **expected** error 
+   // i.e. network, subscription errors
+2. handle **specific** errors **as appropriate** based on where and when they occur 
+   // i.e. network error while uploading a file, invalid login
+3. have a **catch-all** handler for **unknown** errors 
+   // i.e. system libraries runtime errors we don't anticipate
 4. keep our code **DRY**
 
 Java, as a language, provides you with a way to do the above. By mapping cross-cutting errors to runtime exceptions and catching them lower in the call stack, while having specific expected errors mapped to checked exceptions and handle them near where the error occurred. Still, countless are the projects where this simple strategy has gone astray with lots of errors being either swallowed or left for the catch-all `Thread.UncaughtExceptionHandler`. Moreover, it usually comes with significant boilerplate code. `ErrorHandler` however eases this practice through its fluent API, error aliases and defaults mechanism.
