@@ -105,7 +105,7 @@ try {
 ### Run blocks of code using ErrorHandler.run
 
 ```java
-  ErrorHandler.run(() -> fetchNewMessages());
+ErrorHandler.run(() -> fetchNewMessages());
 ```
 
 ### Override defaults when needed
