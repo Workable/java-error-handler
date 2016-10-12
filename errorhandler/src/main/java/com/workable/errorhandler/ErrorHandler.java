@@ -260,6 +260,20 @@ public class ErrorHandler {
     }
 
     /**
+     * Run a custom code block and assign current ErrorHandler instance
+     * to handle a possible exception throw in 'catch'.
+     *
+     * @param blockExecutor functional interface containing Exception prone code
+     */
+    protected void run(BlockExecutor blockExecutor) {
+        try {
+            blockExecutor.invoke();
+        } catch (Exception exception) {
+            handle(exception);
+        }
+    }
+
+    /**
      * Handle {@param error} by executing all matching actions.
      *
      * @param error the error as a {@link Throwable}

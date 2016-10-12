@@ -45,53 +45,53 @@ public class ErrorHandlerTest extends TestCase {
         actionDelegateMock = mock(ActionDelegate.class);
 
         ErrorHandler
-            .defaultErrorHandler()
-            .bind("closed:bar", errorCode -> throwable -> {
-                if (throwable instanceof BarException) {
-                    return !((BarException) throwable).isOpenBar();
-                } else {
-                    return false;
-                }
-            })
-            .bindClass(Integer.class, errorCode -> throwable -> {
-                if (throwable instanceof QuxException) {
-                    return ((QuxException) throwable).getErrorStatus() == errorCode;
-                } else {
-                    return false;
-                }
-            })
-            .on(FooException.class, (throwable, errorHandler) -> actionDelegateMock.defaultAction1())
-            .on(500, (throwable, errorHandler) -> actionDelegateMock.defaultAction2())
-            .otherwise((throwable, errorHandler) -> actionDelegateMock.defaultOtherwise())
-            .always((throwable, errorHandler) -> actionDelegateMock.defaultAlways());
+                .defaultErrorHandler()
+                .bind("closed:bar", errorCode -> throwable -> {
+                    if (throwable instanceof BarException) {
+                        return !((BarException) throwable).isOpenBar();
+                    } else {
+                        return false;
+                    }
+                })
+                .bindClass(Integer.class, errorCode -> throwable -> {
+                    if (throwable instanceof QuxException) {
+                        return ((QuxException) throwable).getErrorStatus() == errorCode;
+                    } else {
+                        return false;
+                    }
+                })
+                .on(FooException.class, (throwable, errorHandler) -> actionDelegateMock.defaultAction1())
+                .on(500, (throwable, errorHandler) -> actionDelegateMock.defaultAction2())
+                .otherwise((throwable, errorHandler) -> actionDelegateMock.defaultOtherwise())
+                .always((throwable, errorHandler) -> actionDelegateMock.defaultAlways());
     }
 
     protected void tearDown() {
         ErrorHandler
-            .defaultErrorHandler()
-            .clear();
+                .defaultErrorHandler()
+                .clear();
     }
 
     @Test
     public void testActionsExecutionOrder() {
         ErrorHandler errorHandler = ErrorHandler
-            .create()
-            .on(FooException.class, (throwable, handler) -> actionDelegateMock.action1())
-            .on(
-                (throwable) -> {
-                    try {
-                        return FooException.class.cast(throwable).isFatal();
-                    } catch (ClassCastException ignore) {
-                        return false;
-                    }
-                },
-                (throwable, handler) -> actionDelegateMock.action2()
-            )
-            .on("closed:bar", (throwable, handler) -> actionDelegateMock.action3())
-            .on(400, (throwable, handler) -> actionDelegateMock.action4())
-            .on(500, (throwable, handler) -> actionDelegateMock.action5())
-            .otherwise((throwable, handler) -> actionDelegateMock.otherwise1())
-            .always((throwable, handler) -> actionDelegateMock.always1());
+                .create()
+                .on(FooException.class, (throwable, handler) -> actionDelegateMock.action1())
+                .on(
+                        (throwable) -> {
+                            try {
+                                return FooException.class.cast(throwable).isFatal();
+                            } catch (ClassCastException ignore) {
+                                return false;
+                            }
+                        },
+                        (throwable, handler) -> actionDelegateMock.action2()
+                )
+                .on("closed:bar", (throwable, handler) -> actionDelegateMock.action3())
+                .on(400, (throwable, handler) -> actionDelegateMock.action4())
+                .on(500, (throwable, handler) -> actionDelegateMock.action5())
+                .otherwise((throwable, handler) -> actionDelegateMock.otherwise1())
+                .always((throwable, handler) -> actionDelegateMock.always1());
 
 
         InOrder testVerifier1 = inOrder(actionDelegateMock);
@@ -135,11 +135,11 @@ public class ErrorHandlerTest extends TestCase {
     @Test
     public void testSkipDefaults() {
         ErrorHandler
-            .create()
-            .on(FooException.class, (throwable, handler) -> {
-                actionDelegateMock.action1();
-            })
-            .handle(new FooException("foo error"));
+                .create()
+                .on(FooException.class, (throwable, handler) -> {
+                    actionDelegateMock.action1();
+                })
+                .handle(new FooException("foo error"));
 
         Mockito.verify(actionDelegateMock, times(1)).action1();
         Mockito.verify(actionDelegateMock, times(1)).defaultAction1();
@@ -147,12 +147,12 @@ public class ErrorHandlerTest extends TestCase {
         reset(actionDelegateMock);
 
         ErrorHandler
-            .create()
-            .on(FooException.class, (throwable, handler) -> {
-                actionDelegateMock.action1();
-                handler.skipDefaults();
-            })
-            .handle(new FooException("foo error"));
+                .create()
+                .on(FooException.class, (throwable, handler) -> {
+                    actionDelegateMock.action1();
+                    handler.skipDefaults();
+                })
+                .handle(new FooException("foo error"));
 
         Mockito.verify(actionDelegateMock, times(1)).action1();
         Mockito.verify(actionDelegateMock, never()).defaultAction1();
@@ -163,21 +163,21 @@ public class ErrorHandlerTest extends TestCase {
         InOrder testVerifier = inOrder(actionDelegateMock);
 
         ErrorHandler
-            .create()
-            .on(FooException.class, (throwable, handler) -> {
-                actionDelegateMock.action1();
-            })
-            .on(FooException.class, (throwable, handler) -> {
-                actionDelegateMock.action2();
-                handler.skipFollowing();
-            })
-            .on(FooException.class, (throwable, handler) -> {
-                actionDelegateMock.action3();
-            })
-            .on(FooException.class, (throwable, handler) -> {
-                actionDelegateMock.action4();
-            })
-            .handle(new FooException("foo error"));
+                .create()
+                .on(FooException.class, (throwable, handler) -> {
+                    actionDelegateMock.action1();
+                })
+                .on(FooException.class, (throwable, handler) -> {
+                    actionDelegateMock.action2();
+                    handler.skipFollowing();
+                })
+                .on(FooException.class, (throwable, handler) -> {
+                    actionDelegateMock.action3();
+                })
+                .on(FooException.class, (throwable, handler) -> {
+                    actionDelegateMock.action4();
+                })
+                .handle(new FooException("foo error"));
 
         testVerifier.verify(actionDelegateMock).action1();
         testVerifier.verify(actionDelegateMock).action2();
@@ -191,21 +191,21 @@ public class ErrorHandlerTest extends TestCase {
         InOrder testVerifier = inOrder(actionDelegateMock);
 
         ErrorHandler
-            .create()
-            .on(FooException.class, (throwable, handler) -> {
-                actionDelegateMock.action1();
-            })
-            .on(FooException.class, (throwable, handler) -> {
-                actionDelegateMock.action2();
-                handler.skipAlways();
-            })
-            .on(FooException.class, (throwable, handler) -> {
-                actionDelegateMock.action3();
-            })
-            .on(FooException.class, (throwable, handler) -> {
-                actionDelegateMock.action4();
-            })
-            .handle(new FooException("foo error"));
+                .create()
+                .on(FooException.class, (throwable, handler) -> {
+                    actionDelegateMock.action1();
+                })
+                .on(FooException.class, (throwable, handler) -> {
+                    actionDelegateMock.action2();
+                    handler.skipAlways();
+                })
+                .on(FooException.class, (throwable, handler) -> {
+                    actionDelegateMock.action3();
+                })
+                .on(FooException.class, (throwable, handler) -> {
+                    actionDelegateMock.action4();
+                })
+                .handle(new FooException("foo error"));
 
         testVerifier.verify(actionDelegateMock).action1();
         testVerifier.verify(actionDelegateMock).action2();
@@ -224,7 +224,7 @@ public class ErrorHandlerTest extends TestCase {
                 .create()
                 .bindClass(DBError.class, errorCode -> throwable -> {
                     if (throwable instanceof DBErrorException) {
-                        return DBError.from((DBErrorException)throwable) == errorCode;
+                        return DBError.from((DBErrorException) throwable) == errorCode;
                     }
                     return false;
                 })
@@ -235,6 +235,45 @@ public class ErrorHandlerTest extends TestCase {
                 .handle(new DBErrorException("read-only"));
 
         testVerifier.verify(actionDelegateMock).action1();
+        testVerifier.verifyNoMoreInteractions();
+        Mockito.verifyNoMoreInteractions(actionDelegateMock);
+    }
+
+    @Test
+    public void testErrorHandlerBlockExecutorExceptionHandling() {
+        InOrder testVerifier = inOrder(actionDelegateMock);
+
+        ErrorHandler
+                .createIsolated()
+                .bindClass(DBError.class, errorCode -> throwable -> throwable instanceof DBErrorException && DBError.from((DBErrorException) throwable) == errorCode)
+                .on(DBError.READ_ONLY, (throwable, errorHandler) -> {
+                    actionDelegateMock.action1();
+                    errorHandler.skipAlways();
+                })
+                .run(() -> {
+                    throw new DBErrorException("read-only");
+                });
+
+        testVerifier.verify(actionDelegateMock).action1();
+        testVerifier.verifyNoMoreInteractions();
+        Mockito.verifyNoMoreInteractions(actionDelegateMock);
+    }
+
+    @Test
+    public void testErrorHandlerBlockExecutorIgnoresNotMatchedException() {
+        InOrder testVerifier = inOrder(actionDelegateMock);
+
+        ErrorHandler
+                .createIsolated()
+                .bindClass(DBError.class, errorCode -> throwable -> throwable instanceof DBErrorException && DBError.from((DBErrorException) throwable) == errorCode)
+                .on(DBError.READ_ONLY, (throwable, errorHandler) -> {
+                    actionDelegateMock.action1();
+                    errorHandler.skipAlways();
+                })
+                .run(() -> {
+                    throw new DBErrorException("read");
+                });
+
         testVerifier.verifyNoMoreInteractions();
         Mockito.verifyNoMoreInteractions(actionDelegateMock);
     }
