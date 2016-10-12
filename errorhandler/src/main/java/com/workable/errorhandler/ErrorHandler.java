@@ -148,7 +148,7 @@ public class ErrorHandler {
      * Register {@param action} to be executed by {@link #handle(Throwable)},
      * if the thrown error is bound (associated) to {@param errorCode}.
      * <p/>
-     * See {@link #bindErrorCodeClass(Class, MatcherFactory)} and {@link #bindErrorCode(Object, MatcherFactory)}
+     * See {@link #bindClass(Class, MatcherFactory)} and {@link #bind(Object, MatcherFactory)}
      * on how to associate arbitrary error codes with actual Throwables via {@link Matcher}.
      *
      * @param errorCode the error code
@@ -259,7 +259,6 @@ public class ErrorHandler {
         }
     }
 
-
     /**
      * Handle {@param error} by executing all matching actions.
      *
@@ -277,8 +276,8 @@ public class ErrorHandler {
     /**
      * Bind an ErrorCode {@param errorCode} with a Matcher,
      * through the provided MatcherFactory {@param matcherFactory}.
-     * */
-    public <T> ErrorHandler bindErrorCode(T errorCode, MatcherFactory<? super T> matcherFactory) {
+     */
+    public <T> ErrorHandler bind(T errorCode, MatcherFactory<? super T> matcherFactory) {
         errorCodeMap.put(new ErrorCodeIdentifier<>(errorCode), matcherFactory);
         return this;
     }
@@ -286,8 +285,8 @@ public class ErrorHandler {
     /**
      * Bind an ErrorCode Class {@param errorCodeClass} with a Matcher,
      * through the provided MatcherFactory {@param matcherFactory}.
-     * */
-    public <T> ErrorHandler bindErrorCodeClass(Class<T> errorCodeClass, MatcherFactory<? super T> matcherFactory) {
+     */
+    public <T> ErrorHandler bindClass(Class<T> errorCodeClass, MatcherFactory<? super T> matcherFactory) {
         errorCodeMap.put(new ErrorCodeIdentifier<>(errorCodeClass), matcherFactory);
         return this;
     }

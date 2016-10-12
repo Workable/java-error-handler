@@ -46,14 +46,14 @@ public class ErrorHandlerTest extends TestCase {
 
         ErrorHandler
             .defaultErrorHandler()
-            .bindErrorCode("closed:bar", errorCode -> throwable -> {
+            .bind("closed:bar", errorCode -> throwable -> {
                 if (throwable instanceof BarException) {
                     return !((BarException) throwable).isOpenBar();
                 } else {
                     return false;
                 }
             })
-            .bindErrorCodeClass(Integer.class, errorCode -> throwable -> {
+            .bindClass(Integer.class, errorCode -> throwable -> {
                 if (throwable instanceof QuxException) {
                     return ((QuxException) throwable).getErrorStatus() == errorCode;
                 } else {
@@ -222,7 +222,7 @@ public class ErrorHandlerTest extends TestCase {
 
         ErrorHandler
                 .create()
-                .bindErrorCodeClass(DBError.class, errorCode -> throwable -> {
+                .bindClass(DBError.class, errorCode -> throwable -> {
                     if (throwable instanceof DBErrorException) {
                         return DBError.from((DBErrorException)throwable) == errorCode;
                     }
