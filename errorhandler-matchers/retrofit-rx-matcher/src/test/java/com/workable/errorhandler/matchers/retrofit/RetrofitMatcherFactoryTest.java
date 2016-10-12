@@ -27,8 +27,8 @@ public class RetrofitMatcherFactoryTest extends TestCase {
     public void test_catching_exact_http_code() {
         ErrorHandler
                 .createIsolated()
-                .bindErrorCode(400, RetrofitMatcherFactory.create())
-                .bindErrorCodeClass(Range.class, RetrofitMatcherFactory.createRange())
+                .bind(400, RetrofitMatcherFactory.create())
+                .bindClass(Range.class, RetrofitMatcherFactory.createRange())
                 .on(400, new Action() {
                     @Override
                     public void execute(Throwable throwable, ErrorHandler errorHandler) {
@@ -51,8 +51,8 @@ public class RetrofitMatcherFactoryTest extends TestCase {
     public void test_not_catching_exact_http_code() {
         ErrorHandler
                 .createIsolated()
-                .bindErrorCode(400, RetrofitMatcherFactory.create())
-                .bindErrorCodeClass(Range.class, RetrofitMatcherFactory.createRange())
+                .bind(400, RetrofitMatcherFactory.create())
+                .bindClass(Range.class, RetrofitMatcherFactory.createRange())
                 .on(400, new Action() {
                     @Override
                     public void execute(Throwable throwable, ErrorHandler errorHandler) {
@@ -75,7 +75,7 @@ public class RetrofitMatcherFactoryTest extends TestCase {
     public void test_catching_with_class() {
         ErrorHandler
                 .createIsolated()
-                .bindErrorCodeClass(Integer.class, RetrofitMatcherFactory.create())
+                .bindClass(Integer.class, RetrofitMatcherFactory.create())
                 .on(500, new Action() {
                     @Override
                     public void execute(Throwable throwable, ErrorHandler errorHandler) {

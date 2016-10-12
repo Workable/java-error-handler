@@ -1,5 +1,5 @@
 group 'com.workable'
-version '0.9'
+version '1.0.0'
 
 apply plugin: 'java'
 

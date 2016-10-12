@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2010-2016 Workable SA
+ * Copyright (c) 2013-2016 Workable SA
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@ package com.workable.errorhandler;
  * Runtime exception to indicate that the user tried to register
  * an {@link Action} via {@link ErrorHandler#on(Object, Action)} with an unknown error code.
  *
- * @author Stratos Pavlakis <pavlakis@workable.com
+ * @author Stratos Pavlakis - pavlakis@workable.com
  */
 public class UnknownErrorCodeException extends RuntimeException {
 

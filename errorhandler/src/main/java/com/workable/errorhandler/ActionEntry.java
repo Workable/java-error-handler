@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2010-2016 Workable SA
+ * Copyright (c) 2013-2016 Workable SA
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -71,6 +71,7 @@ public class ActionEntry {
      *
      * @param matcher the matcher object in the ActionEntry
      * @param action  the action object in the ActionEntry
+     * @return a new ActionEntry
      */
     public static ActionEntry from(Matcher matcher, Action action) {
         return new ActionEntry(matcher, action);

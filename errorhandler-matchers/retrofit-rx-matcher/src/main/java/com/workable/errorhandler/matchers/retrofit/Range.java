@@ -10,9 +10,10 @@ public class Range {
 
     /**
      * Creates a Range object with lower and upper bound
-     * @param lowerBound
-     * @param upperBound
-     * @return
+     * @param lowerBound lower limit of Range
+     * @param upperBound upper limit of Range
+     *
+     * @return a Range instance
      */
     public static Range of(int lowerBound, int upperBound) {
         return new Range(lowerBound, upperBound);
@@ -25,7 +26,8 @@ public class Range {
 
     /**
      * Checks if the passed httpStatusCode is contained in given range
-     * @param httpStatusCode
+     *
+     * @param httpStatusCode the status code to check
      * @return true if contains, otherwise false
      */
     public boolean contains(int httpStatusCode) {

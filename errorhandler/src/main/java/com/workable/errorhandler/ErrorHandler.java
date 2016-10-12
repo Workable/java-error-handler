@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2010-2016 Workable SA
+ * Copyright (c) 2013-2016 Workable SA
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,9 +34,9 @@ import java.util.Map;
  * An ErrorHandler is responsible for handling an error by executing one or more actions,
  * instances of {@link Action}, that are found to match the error.
  *
- * @author Stratos Pavlakis <pavlakis@workable.com>
- * @author Pavlos-Petros Tournaris <tournaris@workable.com>
- * @author Vasilis Charalampakis <basilis@workable.com>
+ * @author Stratos Pavlakis - pavlakis@workable.com
+ * @author Pavlos-Petros Tournaris - tournaris@workable.com
+ * @author Vasilis Charalampakis - basilis@workable.com
  */
 public class ErrorHandler {
 
@@ -80,7 +80,7 @@ public class ErrorHandler {
      * In other words, designed to handle all errors by itself without delegating
      * to the default error handler.
      *
-     * @return returns a new instance of ErrorHandler
+     * @return returns a new {@code ErrorHandler} instance
      */
     public static ErrorHandler createIsolated() {
         return new ErrorHandler();
@@ -91,7 +91,7 @@ public class ErrorHandler {
      * <p>
      * Any default actions, are always executed after the ones registered on this one.
      *
-     * @return returns a new instance of ErrorHandler
+     * @return returns a new {@code ErrorHandler} instance
      */
     public static ErrorHandler create() {
         return new ErrorHandler(defaultErrorHandler());
@@ -111,12 +111,12 @@ public class ErrorHandler {
     }
 
     /**
-     * Register {@param action} to be executed by {@link #handle(Throwable)},
-     * if the thrown error matches the {@param matcher}.
+     * Register {@code action} to be executed by {@link #handle(Throwable)},
+     * if the thrown error matches the {@code matcher}.
      *
      * @param matcher a matcher to match the thrown error
      * @param action  the associated action
-     * @return the current instance of ErrorHandler
+     * @return the current {@code ErrorHandler} instance - to use in command chains
      */
     public ErrorHandler on(Matcher matcher, Action action) {
         if (matcher == null) {
@@ -128,12 +128,12 @@ public class ErrorHandler {
     }
 
     /**
-     * Register {@param action} to be executed by {@link #handle(Throwable)},
-     * if the thrown error is an instance of {@param exceptionClass}.
+     * Register {@code action} to be executed by {@link #handle(Throwable)},
+     * if the thrown error is an instance of {@code exceptionClass}.
      *
      * @param exceptionClass the class of the error
      * @param action         the associated action
-     * @return the current instance of ErrorHandler
+     * @return the current {@code ErrorHandler} instance - to use in command chains
      */
     public ErrorHandler on(Class<? extends Exception> exceptionClass, Action action) {
         if (exceptionClass == null) {
@@ -145,15 +145,16 @@ public class ErrorHandler {
     }
 
     /**
-     * Register {@param action} to be executed by {@link #handle(Throwable)},
-     * if the thrown error is bound (associated) to {@param errorCode}.
-     * <p/>
-     * See {@link #bindErrorCodeClass(Class, MatcherFactory)} and {@link #bindErrorCode(Object, MatcherFactory)}
+     * Register {@code action} to be executed by {@link #handle(Throwable)},
+     * if the thrown error is bound (associated) to {@code errorCode}.
+     * <p>
+     * See {@link #bindClass(Class, MatcherFactory)} and {@link #bind(Object, MatcherFactory)}
      * on how to associate arbitrary error codes with actual Throwables via {@link Matcher}.
-     *
+     * </p>
+     * @param <T> the error code type
      * @param errorCode the error code
      * @param action    the associated action
-     * @return the current instance of ErrorHandler
+     * @return the current {@code ErrorHandler} instance - to use in command chains
      */
     public <T> ErrorHandler on(T errorCode, Action action) {
         if (errorCode == null) {
@@ -170,11 +171,11 @@ public class ErrorHandler {
     }
 
     /**
-     * Register {@param action} to be executed in case no other <em>conditional</em>
+     * Register {@code action} to be executed in case no other <em>conditional</em>
      * action gets executed.
      *
      * @param action the action
-     * @return the current instance of ErrorHandler
+     * @return the current {@code ErrorHandler} instance - to use in command chains
      */
     public ErrorHandler otherwise(Action action) {
         assertNotNullAction(action);
@@ -183,10 +184,10 @@ public class ErrorHandler {
     }
 
     /**
-     * Register {@param action} to be executed on all errors.
+     * Register {@code action} to be executed on all errors.
      *
      * @param action the action
-     * @return the current instance of ErrorHandler
+     * @return the current {@code ErrorHandler} instance - to use in command chains
      */
     public ErrorHandler always(Action action) {
         assertNotNullAction(action);
@@ -196,6 +197,7 @@ public class ErrorHandler {
 
     /**
      * Skip all following actions registered via an {@code on} method
+     * @return the current {@code ErrorHandler} instance - to use in command chains
      */
     public ErrorHandler skipFollowing() {
         if (localContext != null) {
@@ -206,6 +208,7 @@ public class ErrorHandler {
 
     /**
      * Skip all actions registered via {@link #always(Action)}
+     * @return the current {@code ErrorHandler} instance - to use in command chains
      */
     public ErrorHandler skipAlways() {
         if (localContext != null) {
@@ -216,6 +219,7 @@ public class ErrorHandler {
 
     /**
      * Skip the default matching actions if any
+     * @return the current {@code ErrorHandler} instance - to use in command chains
      */
     public ErrorHandler skipDefaults() {
         if (localContext != null) {
@@ -259,9 +263,22 @@ public class ErrorHandler {
         }
     }
 
+    /**
+     * Run a custom code block and assign current ErrorHandler instance
+     * to handle a possible exception throw in 'catch'.
+     *
+     * @param blockExecutor functional interface containing Exception prone code
+     */
+    protected void run(BlockExecutor blockExecutor) {
+        try {
+            blockExecutor.invoke();
+        } catch (Exception exception) {
+            handle(exception);
+        }
+    }
 
     /**
-     * Handle {@param error} by executing all matching actions.
+     * Handle {@code error} by executing all matching actions.
      *
      * @param error the error as a {@link Throwable}
      */
@@ -275,19 +292,78 @@ public class ErrorHandler {
     }
 
     /**
-     * Bind an ErrorCode {@param errorCode} with a Matcher,
-     * through the provided MatcherFactory {@param matcherFactory}.
-     * */
-    public <T> ErrorHandler bindErrorCode(T errorCode, MatcherFactory<? super T> matcherFactory) {
+     * Bind an {@code errorCode} to a {@code Matcher}, using a {@code MatcherFactory}.
+     *
+     * <p>
+     * For example, when we need to catch a network timeout it's better to just write "timeout"
+     * instead of a train-wreck expression. So we need to bind this "timeout" error code to an actual
+     * condition that will check the actual error when it occurs to see if its a network timeout or not.
+     * </p>
+     *
+     * <pre>
+     * {@code
+     *   ErrorHandler
+     *      .defaultErrorHandler()
+     *      .bind("timeout", errorCode -> throwable -> {
+     *          return (throwable instanceof SocketTimeoutException) && throwable.getMessage().contains("Read timed out");
+     *       });
+     *
+     *   // ...
+     *
+     *   ErrorHandler
+     *      .build()
+     *      .on("timeout", (throwable, handler) -> {
+     *          showOfflineScreen();
+     *      })
+     * }
+     * </pre>
+     *
+     *
+     * @param <T> the error code type
+     * @param errorCode the errorCode value, can use a primitive for clarity and let it be autoboxed
+     * @param matcherFactory a factory that given an error code, provides a matcher to match the error against it
+     * @return the current {@code ErrorHandler} instance - to use in command chains
+     */
+    public <T> ErrorHandler bind(T errorCode, MatcherFactory<? super T> matcherFactory) {
         errorCodeMap.put(new ErrorCodeIdentifier<>(errorCode), matcherFactory);
         return this;
     }
 
     /**
-     * Bind an ErrorCode Class {@param errorCodeClass} with a Matcher,
-     * through the provided MatcherFactory {@param matcherFactory}.
-     * */
-    public <T> ErrorHandler bindErrorCodeClass(Class<T> errorCodeClass, MatcherFactory<? super T> matcherFactory) {
+     * Bind an {@code errorCode} <code>Class</code> to a {@code Matcher}, using a {@code MatcherFactory}.
+     *
+     * <p>
+     * For example, when we prefer using plain integers to refer to HTTP errors instead of
+     * checking the HTTPException status code every time.
+     * </p>
+     *
+     * <pre>
+     * {@code
+     *   ErrorHandler
+     *      .defaultErrorHandler()
+     *      .bindClass(Integer.class, errorCode -> throwable -> {
+     *          return throwable instanceof HTTPException && ((HTTPException)throwable).getStatusCode() == errorCode;
+     *       });
+     *
+     *   // ...
+     *
+     *   ErrorHandler
+     *      .build()
+     *      .on(404, (throwable, handler) -> {
+     *          showResourceNotFoundError();
+     *      })
+     *      .on(500, (throwable, handler) -> {
+     *          showServerError();
+     *      })
+     * }
+     * </pre>
+     *
+     * @param <T> the error code type
+     * @param errorCodeClass the errorCode class
+     * @param matcherFactory a factory that given an error code, provides a matcher to match the error against it
+     * @return the current {@code ErrorHandler} instance - to use in command chains
+     */
+    public <T> ErrorHandler bindClass(Class<T> errorCodeClass, MatcherFactory<? super T> matcherFactory) {
         errorCodeMap.put(new ErrorCodeIdentifier<>(errorCodeClass), matcherFactory);
         return this;
     }
@@ -328,7 +404,7 @@ public class ErrorHandler {
     }
 
     /**
-     * Throws if {@param action} is null
+     * Throws if {@code action} is null
      *
      * @param action the action to assert against
      */

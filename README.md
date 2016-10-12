@@ -5,13 +5,15 @@
 
 > Error handling library for Android and Java
 
+Encapsulate error handling logic into objects that adhere to configurable defaults. Then pass them around as parameters or inject them via DI. 
+
 ## Download
 Download the [latest JAR](https://bintray.com/workable/maven/ErrorHandler/_latestVersion) or grab via Maven:
 ```xml
 <dependency>
   <groupId>com.workable</groupId>
   <artifactId>error-handler</artifactId>
-  <version>0.9.1</version>
+  <version>1.0.0</version>
   <type>pom</type>
 </dependency>
 ```
@@ -19,7 +21,7 @@ Download the [latest JAR](https://bintray.com/workable/maven/ErrorHandler/_lates
 or Gradle:
 
 ```groovy
-compile 'com.workable:error-handler:0.9.1'
+compile 'com.workable:error-handler:1.0.0'
 ```
 
 
@@ -42,22 +44,22 @@ ErrorHandler
   .defaultErrorHandler()
 
   // Bind certain exceptions to "offline"
-  .bindErrorCode("offline", errorCode -> throwable -> {
+  .bind("offline", errorCode -> throwable -> {
       return throwable instanceof UnknownHostException || throwable instanceof ConnectException;
   })
 
   // Bind HTTP 404 status to 404
-  .bindErrorCode(404, errorCode -> throwable -> {
+  .bind(404, errorCode -> throwable -> {
       return ((HttpException) throwable).code() == 404;
   })
 
   // Bind HTTP 500 status to 500
-  .bindErrorCode(500, errorCode -> throwable -> {
+  .bind(500, errorCode -> throwable -> {
       return ((HttpException) throwable).code() == 500;
   })
 
   // Bind all DB errors to a custom enumeration
-  .bindErrorCodeClass(DBError.class, errorCode -> throwable -> {
+  .bindClass(DBError.class, errorCode -> throwable -> {
       return DBError.from(throwable) == errorCode;
   })
 
@@ -98,6 +100,12 @@ try {
 } catch (Exception ex) {
   ErrorHandler.create().handle(ex);
 }
+```
+
+### Run blocks of code using ErrorHandler.run
+
+```java
+ErrorHandler.run(() -> fetchNewMessages());
 ```
 
 ### Override defaults when needed
@@ -150,7 +158,7 @@ ErrorHandler is __thread-safe__.
 
 * `on(Class<? extends Exception>, Action)` Register an _Action_ to be executed if error is an instance of `Exception`.
 
-* `on(T, Action)` Register an _Action_ to be executed if error is bound to T, through `bindErrorCode()` or `bindErrorCodeClass()`.
+* `on(T, Action)` Register an _Action_ to be executed if error is bound to T, through `bind()` or `bindClass()`.
 
 * `otherwise(Action)` Register an _Action_ to be executed only if no other _Action_ gets executed.
 
@@ -162,9 +170,9 @@ ErrorHandler is __thread-safe__.
 
 * `skipDefaults()` Skip any default actions. Meaning any actions registered on the `defaultErrorHandler` instance.
 
-* `bindErrorCode(T, MatcherFactory<T>)` Bind instances of _T_ to match errors through a matcher provided by _MatcherFactory_.
+* `bind(T, MatcherFactory<T>)` Bind instances of _T_ to match errors through a matcher provided by _MatcherFactory_.
 
-* `bindErrorCodeClass(Class<T>, MatcherFactory<T>)` Bind class _T_ to match errors through a matcher provided by _MatcherFactory_.
+* `bindClass(Class<T>, MatcherFactory<T>)` Bind class _T_ to match errors through a matcher provided by _MatcherFactory_.
 
 * `clear()` Clear all registered _Actions_.
 
@@ -174,23 +182,18 @@ ErrorHandler is __thread-safe__.
 
 
 ## About
-A common problem in software, specially in UI software is that of error handling.
 
-One way to classify errors can be by how they relate to the [problem domain](https://en.wikipedia.org/wiki/Problem_domain). Some errors, like `network` or `database` errors are orthogonal to the problem domain and designate truly **exceptional conditions**, while others are core parts of the domain like `validation` and `authentication` errors.
+When designing for errors, we usually need to:
 
-Another way to classify errors is by their **scope**. Are they **common** throughout the application or **specific** to a single screen, object or even method? Think of `UnauthorizedException` versus `InvalidPasswordException`.
+1. have a **default** handler for every **expected** error 
+   // i.e. network, subscription errors
+2. handle **specific** errors **as appropriate** based on where and when they occur 
+   // i.e. network error while uploading a file, invalid login
+3. have a **catch-all** handler for **unknown** errors 
+   // i.e. system libraries runtime errors we don't anticipate
+4. keep our code **DRY**
 
-And let's not forget another very simple distinction between errors. Those that are known at authoring time and thus **expected** (despite of how probable is that they occur), and those that are **unknown** until runtime.
-
-With that in mind, we usually want to:
-
-1. have a **default** handler for every **expected** (exceptional, common or not) error
-2. handle **specific** errors **as appropriate** based on where and when they occur
-3. have a **default** catch-all handler for **unknown** errors
-4. **override** any default handler if needed
-5. keep our code **DRY**
-
-Java, as a language, provides you with a way to do the above. By mapping exceptional or very common errors to runtime exceptions and catching them lower in the call stack, while having specific expected errors mapped to checked exceptions and handle them near where the error occurred. Still, countless are the projects where this simple strategy has gone astray with lots of errors being either swallowed or left for the catch-all `Thread.UncaughtExceptionHandler`. Moreover, it usually comes with significant boilerplate code. `ErrorHandler` however eases this practice through its fluent API, error aliases and defaults mechanism.
+Java, as a language, provides you with a way to do the above. By mapping cross-cutting errors to runtime exceptions and catching them lower in the call stack, while having specific expected errors mapped to checked exceptions and handle them near where the error occurred. Still, countless are the projects where this simple strategy has gone astray with lots of errors being either swallowed or left for the catch-all `Thread.UncaughtExceptionHandler`. Moreover, it usually comes with significant boilerplate code. `ErrorHandler` however eases this practice through its fluent API, error aliases and defaults mechanism.
 
 This library doesn't try to solve Java specific problems, although it does help with the `log and shallow` anti-pattern as it provides an opinionated and straightforward way to act inside every `catch` block.  It was created for the needs of an Android app and proved itself useful very quickly. So it may work for you as well. If you like the concept and you're developing in  _Swift_ or _Javascript_, we're baking 'em and will be available really soon.
 

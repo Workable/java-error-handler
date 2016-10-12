@@ -24,16 +24,11 @@
 
 package com.workable.errorhandler;
 
-public class ExceptionMatcher implements Matcher {
-
-    private Class<? extends Exception> errorClass;
-
-    public ExceptionMatcher(Class<? extends Exception> errorClass) {
-        this.errorClass = errorClass;
-    }
-
-    @Override
-    public boolean matches(Throwable throwable) {
-        return errorClass.isInstance(throwable);
-    }
+/**
+ * Functional interface to run code blocks
+ *
+ * @author Pavlos-Petros Tournaris
+ */
+public interface BlockExecutor {
+    void invoke() throws Exception;
 }
