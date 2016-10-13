@@ -1,7 +1,18 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+plugins {
+    id "com.jfrog.bintray" version "1.7"
+}
+
 group 'com.workable'
-version '1.0.0'
+version 'v1.0.1-alpha'
 
 apply plugin: 'java'
+apply plugin: 'maven-publish'
 
 sourceCompatibility = 1.7
 
@@ -15,4 +26,73 @@ dependencies {
 
     compile project(':errorhandler')
     compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId 'com.workable'
+            artifactId 'retrofit-rx-matcher'
+            version 'v1.0.1-alpha'
+
+            from components.java
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+
+            artifact javadocJar {
+                classifier "javadoc"
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url "./dist"
+        }
+    }
+}
+
+
+Properties localProps = new Properties()
+
+try {
+    localProps.load(project.file('../../local.properties').newDataInputStream())
+} catch(Exception ex) {
+    logger.warn('local.properties file is missing')
+}
+
+bintray {
+    user = localProps.getProperty('bintrayUser')
+    key = localProps.getProperty('bintrayApiKey')
+    publications = ['mavenJava']
+    pkg {
+        repo = 'maven'
+        name = 'ErrorHandler'
+        desc = 'Error handling library for Android and Java'
+        userOrg = "workable"
+        licenses = ['MIT']
+        vcsUrl = 'https://github.com/Workable/java-error-handler'
+        labels = ['java', 'error handler', 'errors', 'android']
+        publicDownloadNumbers = true
+        version {
+            name = 'v1.0.1-alpha'
+
+            desc = 'Error handling library for Android and Java'
+            vcsTag = 'v1.0.0'
+            gpg {
+                sign = true //Determines whether to GPG sign the files. The default is false
+            }
+        }
+    }
 }
