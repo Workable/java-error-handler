@@ -1,6 +1,5 @@
 # ErrorHandler
 [![Download](https://api.bintray.com/packages/workable/maven/ErrorHandler/images/download.svg) ](https://bintray.com/workable/maven/ErrorHandler/_latestVersion)
-[![Bintray](https://img.shields.io/bintray/v/workable/maven/ErrorHandler.svg?maxAge=2592000)](https://bintray.com/workable/maven/ErrorHandler)
 [![Travis](https://travis-ci.org/Workable/java-error-handler.svg?branch=master)](https://travis-ci.org/Workable/java-error-handler)
 
 > Error handling library for Android and Java
@@ -13,7 +12,7 @@ Download the [latest JAR](https://bintray.com/workable/maven/ErrorHandler/_lates
 <dependency>
   <groupId>com.workable</groupId>
   <artifactId>error-handler</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <type>pom</type>
 </dependency>
 ```
@@ -21,7 +20,7 @@ Download the [latest JAR](https://bintray.com/workable/maven/ErrorHandler/_lates
 or Gradle:
 
 ```groovy
-compile 'com.workable:error-handler:1.0.0'
+compile 'com.workable:error-handler:1.0.1'
 ```
 
 
