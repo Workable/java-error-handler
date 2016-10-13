@@ -5,3 +5,4 @@
 /local.properties
 *.class
 errorhandler-matchers/retrofit-rx-matcher/build/
+errorhandler-matchers/retrofit-rx-matcher/.gradle/
