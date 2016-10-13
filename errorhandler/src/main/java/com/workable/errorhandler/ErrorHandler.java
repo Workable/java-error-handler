@@ -269,7 +269,7 @@ public class ErrorHandler {
      *
      * @param blockExecutor functional interface containing Exception prone code
      */
-    protected void run(BlockExecutor blockExecutor) {
+    public void run(BlockExecutor blockExecutor) {
         try {
             blockExecutor.invoke();
         } catch (Exception exception) {
