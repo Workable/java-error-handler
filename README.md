@@ -49,12 +49,12 @@ ErrorHandler
 
   // Bind HTTP 404 status to 404
   .bind(404, errorCode -> throwable -> {
-      return ((HttpException) throwable).code() == 404;
+      return throwable instanceof HttpException && ((HttpException) throwable).code() == 404;
   })
 
   // Bind HTTP 500 status to 500
   .bind(500, errorCode -> throwable -> {
-      return ((HttpException) throwable).code() == 500;
+      return throwable instanceof HttpException && ((HttpException) throwable).code() == 500;
   })
 
   // Bind all DB errors to a custom enumeration
