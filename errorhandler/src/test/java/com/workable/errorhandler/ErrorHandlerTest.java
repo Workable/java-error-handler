@@ -34,6 +34,8 @@ public class ErrorHandlerTest extends TestCase {
 
         void defaultAction2();
 
+        void defaultAction3();
+
         void defaultOtherwise();
 
         void defaultAlways();
@@ -62,6 +64,7 @@ public class ErrorHandlerTest extends TestCase {
                 })
                 .on(FooException.class, (throwable, errorHandler) -> actionDelegateMock.defaultAction1())
                 .on(500, (throwable, errorHandler) -> actionDelegateMock.defaultAction2())
+                .on("closed:bar", (throwable, errorHandler) -> actionDelegateMock.defaultAction3())
                 .otherwise((throwable, errorHandler) -> actionDelegateMock.defaultOtherwise())
                 .always((throwable, errorHandler) -> actionDelegateMock.defaultAlways());
     }
@@ -276,6 +279,36 @@ public class ErrorHandlerTest extends TestCase {
 
         testVerifier.verifyNoMoreInteractions();
         Mockito.verifyNoMoreInteractions(actionDelegateMock);
+    }
+
+    @Test
+    public void testErrorHandlerIfSkipDefaults() {
+        InOrder testVerifier = inOrder(actionDelegateMock);
+
+        ErrorHandler
+                .create()
+                .skipDefaults()
+                .on("closed:bar", (throwable, handler) -> {
+                    actionDelegateMock.action1();
+                })
+                .run(() -> {
+                    throw new BarException("", false);
+                });
+
+        testVerifier.verify(actionDelegateMock).action1();
+        Mockito.verifyNoMoreInteractions(actionDelegateMock);
+
+        ErrorHandler
+                .create()
+                .on("closed:bar", (throwable, handler) -> {
+                    actionDelegateMock.action2();
+                })
+                .run(() -> {
+                    throw new BarException("", false);
+                });
+
+        testVerifier.verify(actionDelegateMock).action2();
+        testVerifier.verify(actionDelegateMock).defaultAction3();
     }
 
     private enum DBError {

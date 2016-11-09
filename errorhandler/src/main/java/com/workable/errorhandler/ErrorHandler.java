@@ -62,6 +62,12 @@ public class ErrorHandler {
         this.otherwiseActions = new ArrayList<>();
         this.alwaysActions = new ArrayList<>();
         this.errorCodeMap = new HashMap<>();
+        this.localContext = new ThreadLocal<Context>(){
+            @Override
+            protected Context initialValue() {
+                return new Context();
+            }
+        };
     }
 
     /**
@@ -273,7 +279,7 @@ public class ErrorHandler {
         try {
             blockExecutor.invoke();
         } catch (Exception exception) {
-            handle(exception);
+            handle(exception, localContext);
         }
     }
 
@@ -283,12 +289,7 @@ public class ErrorHandler {
      * @param error the error as a {@link Throwable}
      */
     public void handle(Throwable error) {
-        this.handle(error, new ThreadLocal<Context>() {
-            @Override
-            protected Context initialValue() {
-                return new Context();
-            }
-        });
+        this.handle(error, localContext);
     }
 
     /**
