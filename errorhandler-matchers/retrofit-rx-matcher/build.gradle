@@ -9,7 +9,7 @@ plugins {
 }
 
 group 'com.workable'
-version 'v1.0.1-alpha'
+version '1.0.1-alpha3'
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
@@ -42,7 +42,7 @@ publishing {
         mavenJava(MavenPublication) {
             groupId 'com.workable'
             artifactId 'retrofit-rx-matcher'
-            version 'v1.0.1-alpha'
+            version '1.0.1-alpha3'
 
             from components.java
 
@@ -86,7 +86,7 @@ bintray {
         labels = ['java', 'error handler', 'errors', 'android']
         publicDownloadNumbers = true
         version {
-            name = 'v1.0.1-alpha'
+            name = '1.0.1-alpha3'
 
             desc = 'Error handling library for Android and Java'
             vcsTag = 'v1.0.0'
