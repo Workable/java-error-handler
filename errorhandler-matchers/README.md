@@ -8,7 +8,7 @@ In order to use them, provide an instance of your desired MatcherFactory when bu
 
 ErrorHandler
   .create()
-  .bindErrorCode(400, RetrofitMatcherFactory.create())
+  .bind(400, RetrofitMatcherFactory.create())
   .on(400, (throwable, errorHandler) -> showErrorMessage("what?"))
   .handle(httpException);
 
@@ -16,8 +16,8 @@ ErrorHandler
 
 ErrorHandler
   .create()
-  .bindErrorCodeClass(Range.class, RetrofitMatcherFactory.createRange())
-  .bindErrorCodeClass(Integer.class, RetrofitMatcherFactory.create())
+  .bindClass(Range.class, RetrofitMatcherFactory.createRange())
+  .bindClass(Integer.class, RetrofitMatcherFactory.create())
   .on(400, (throwable, errorHandler) -> showErrorMessage("what?"))
   .on(Range.of(500, 599), (throwable, errorHandler) -> showErrorMessage("kaboom"))
   .handle(httpException);
