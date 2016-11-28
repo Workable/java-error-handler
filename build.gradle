@@ -1,5 +1,5 @@
 group 'com.workable'
-version '1.0.1-alpha3'
+version '1.1.0'
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
@@ -19,7 +19,7 @@ publishing {
         mavenJava(MavenPublication) {
             groupId 'com.workable'
             artifactId 'parent'
-            version '1.0.1-alpha3'
+            version '1.1.0'
         }
     }
 

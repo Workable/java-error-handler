@@ -12,7 +12,7 @@ Download the [latest JAR](https://bintray.com/workable/maven/ErrorHandler/_lates
 <dependency>
   <groupId>com.workable</groupId>
   <artifactId>error-handler</artifactId>
-  <version>1.0.1</version>
+  <version>1.1.0</version>
   <type>pom</type>
 </dependency>
 ```
@@ -20,7 +20,7 @@ Download the [latest JAR](https://bintray.com/workable/maven/ErrorHandler/_lates
 or Gradle:
 
 ```groovy
-compile 'com.workable:error-handler:1.0.1'
+compile 'com.workable:error-handler:1.1.0'
 ```
 
 
