@@ -116,6 +116,7 @@ public class ErrorHandlerTest extends TestCase {
 
         testVerifier2.verify(actionDelegateMock).action3();
         testVerifier2.verify(actionDelegateMock).always1();
+        testVerifier2.verify(actionDelegateMock).defaultAction3();
         testVerifier2.verify(actionDelegateMock).defaultAlways();
         testVerifier2.verifyNoMoreInteractions();
         Mockito.verifyNoMoreInteractions(actionDelegateMock);
