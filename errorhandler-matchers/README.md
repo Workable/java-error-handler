@@ -4,6 +4,14 @@ By default ErrorHandler provides you with a public, fully customizable MatcherFa
 
 In order to use them, provide an instance of your desired MatcherFactory when building your ErrorHandler instances.
 
+## Usage
+
+### Retrofit-Rx-Matcher
+
+```gradle
+compile 'com.workable:retrofit-rx-matcher:1.1.0'
+```
+
 ```java
 
 ErrorHandler
