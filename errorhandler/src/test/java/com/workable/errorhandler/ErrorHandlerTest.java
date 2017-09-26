@@ -283,6 +283,18 @@ public class ErrorHandlerTest extends TestCase {
     }
 
     @Test
+    public void testErrorHandlerBlockExecutorIgnoresNotMatchedExceptionWithParentBindings() {
+        ErrorHandler
+                .withBindingsFrom(ErrorHandler.defaultErrorHandler())
+                .on("closed:bar", (throwable, errorHandler) -> actionDelegateMock.action3())
+                .handle(new BarException("What a shame", false));
+
+        verify(actionDelegateMock, times(1)).action3();
+        verify(actionDelegateMock, times(0)).defaultAction3();
+        Mockito.verifyNoMoreInteractions(actionDelegateMock);
+    }
+
+    @Test
     public void testErrorHandlerIfSkipDefaults() {
         InOrder testVerifier = inOrder(actionDelegateMock);
 

@@ -62,7 +62,7 @@ public class ErrorHandler {
         this.otherwiseActions = new ArrayList<>();
         this.alwaysActions = new ArrayList<>();
         this.errorCodeMap = new HashMap<>();
-        this.localContext = new ThreadLocal<Context>(){
+        this.localContext = new ThreadLocal<Context>() {
             @Override
             protected Context initialValue() {
                 return new Context();
@@ -90,6 +90,24 @@ public class ErrorHandler {
      */
     public static ErrorHandler createIsolated() {
         return new ErrorHandler();
+    }
+
+    /**
+     * Create a new @{link ErrorHandler}, isolated from the default one.
+     * <p>
+     * In other words, designed to handle all errors by itself without delegating
+     * to the default error handler.
+     *
+     * @return returns a new {@code ErrorHandler} instance
+     */
+    public static ErrorHandler withBindingsFrom(ErrorHandler errorHandler) {
+        if (errorHandler == null) {
+            throw new IllegalStateException("errorHandler is not initialized");
+        }
+
+        ErrorHandler eh = new ErrorHandler();
+        eh.errorCodeMap = errorHandler.errorCodeMap;
+        return eh;
     }
 
     /**
@@ -157,7 +175,8 @@ public class ErrorHandler {
      * See {@link #bindClass(Class, MatcherFactory)} and {@link #bind(Object, MatcherFactory)}
      * on how to associate arbitrary error codes with actual Throwables via {@link Matcher}.
      * </p>
-     * @param <T> the error code type
+     *
+     * @param <T>       the error code type
      * @param errorCode the error code
      * @param action    the associated action
      * @return the current {@code ErrorHandler} instance - to use in command chains
@@ -203,6 +222,7 @@ public class ErrorHandler {
 
     /**
      * Skip all following actions registered via an {@code on} method
+     *
      * @return the current {@code ErrorHandler} instance - to use in command chains
      */
     public ErrorHandler skipFollowing() {
@@ -214,6 +234,7 @@ public class ErrorHandler {
 
     /**
      * Skip all actions registered via {@link #always(Action)}
+     *
      * @return the current {@code ErrorHandler} instance - to use in command chains
      */
     public ErrorHandler skipAlways() {
@@ -225,6 +246,7 @@ public class ErrorHandler {
 
     /**
      * Skip the default matching actions if any
+     *
      * @return the current {@code ErrorHandler} instance - to use in command chains
      */
     public ErrorHandler skipDefaults() {
@@ -294,13 +316,13 @@ public class ErrorHandler {
 
     /**
      * Bind an {@code errorCode} to a {@code Matcher}, using a {@code MatcherFactory}.
-     *
+     * <p>
      * <p>
      * For example, when we need to catch a network timeout it's better to just write "timeout"
      * instead of a train-wreck expression. So we need to bind this "timeout" error code to an actual
      * condition that will check the actual error when it occurs to see if its a network timeout or not.
      * </p>
-     *
+     * <p>
      * <pre>
      * {@code
      *   ErrorHandler
@@ -319,9 +341,8 @@ public class ErrorHandler {
      * }
      * </pre>
      *
-     *
-     * @param <T> the error code type
-     * @param errorCode the errorCode value, can use a primitive for clarity and let it be autoboxed
+     * @param <T>            the error code type
+     * @param errorCode      the errorCode value, can use a primitive for clarity and let it be autoboxed
      * @param matcherFactory a factory that given an error code, provides a matcher to match the error against it
      * @return the current {@code ErrorHandler} instance - to use in command chains
      */
@@ -332,12 +353,12 @@ public class ErrorHandler {
 
     /**
      * Bind an {@code errorCode} <code>Class</code> to a {@code Matcher}, using a {@code MatcherFactory}.
-     *
+     * <p>
      * <p>
      * For example, when we prefer using plain integers to refer to HTTP errors instead of
      * checking the HTTPException status code every time.
      * </p>
-     *
+     * <p>
      * <pre>
      * {@code
      *   ErrorHandler
@@ -359,7 +380,7 @@ public class ErrorHandler {
      * }
      * </pre>
      *
-     * @param <T> the error code type
+     * @param <T>            the error code type
      * @param errorCodeClass the errorCode class
      * @param matcherFactory a factory that given an error code, provides a matcher to match the error against it
      * @return the current {@code ErrorHandler} instance - to use in command chains
